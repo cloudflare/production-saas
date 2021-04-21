@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "cfw build",
+    "deploy": "cfw deploy",
+    "types": "tsc -p"
+  },
+  "devDependencies": {
+    "cfw": "0.1.3",
+    "typescript": "4.2.4",
+    "worktop": "0.4.2"
+  }
+}
