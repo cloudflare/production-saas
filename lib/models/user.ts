@@ -1,6 +1,7 @@
+import * as JWT from 'lib/utils/jwt';
 import * as keys from 'lib/utils/keys';
-import * as database from 'lib/utils/database';
 import * as Password from 'lib/models/password';
+import * as database from 'lib/utils/database';
 import * as Email from './email';
 
 import type { UID } from 'worktop/utils';
@@ -34,15 +35,6 @@ export const ID = keys.factory<UserID>('users', 16);
 export function find(uid: UserID) {
 	const key = ID.toKID(uid);
 	return database.read<User>(key);
-}
-
-/**
- * Format a `User` document for public display
- * @NOTE Ensures `password` & `salt` are never public!
- */
-export function output(user: User) {
-	const { uid, firstname, lastname, email, created_at, last_updated } = user;
-	return { uid, firstname, lastname, email, created_at, last_updated };
 }
 
 /**
@@ -120,4 +112,21 @@ export async function update(user: User, changes: UserChanges): Promise<User|fal
 	}
 
 	return user;
+}
+
+/**
+ * Format a `User` document for public display
+ * @NOTE Ensures `password` & `salt` are never public!
+ */
+export function output(user: User) {
+	const { uid, firstname, lastname, email, created_at, last_updated } = user;
+	return { uid, firstname, lastname, email, created_at, last_updated };
+}
+
+/**
+ * Format a `User` document while computing a fresh JWT.
+ */
+export async function tokenize(user: User) {
+	const token = await JWT.sign(user);
+	return { user: output(user), token };
 }
