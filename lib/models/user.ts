@@ -4,6 +4,7 @@ import * as Password from 'lib/models/password';
 import * as database from 'lib/utils/database';
 import * as Email from './email';
 
+import type { Handler } from 'worktop';
 import type { UID } from 'worktop/utils';
 import type { SALT, PASSWORD } from 'lib/models/password';
 
@@ -148,4 +149,28 @@ export async function identify(token: string): Promise<User|void> {
 	if (user.salt !== salt) throw JWT.INVALID;
 
 	return user;
+}
+
+/**
+ * Authentication middleware
+ * Identifies a User via incoming `Authorization` header.
+ * @TODO Potentially add `Cookie` identity-parsing fallback.
+ */
+export const authenticate: Handler = async function (req, res) {
+	// TODO? Generic error messages instead?
+	const auth = req.headers.get('authorization');
+	if (!auth) return res.send(401, 'Missing Authorization header');
+
+	const [schema, token] = auth.split(' ');
+	if (schema !== 'Bearer') return res.send(401, 'Invalid Authorization format');
+	if (!token) return res.send(401, 'Missing Authorization token');
+
+	try {
+		var user = await identify(token);
+	} catch (err) {
+		return res.send(401, err.message);
+	}
+
+	// @ts-ignore - TODO(worktop) https://github.com/lukeed/worktop/issues/7
+	req.user = user;
 }
