@@ -26,9 +26,19 @@ export const list = compose(
 export const create = compose(
 	User.authenticate,
 	async function (req, res) {
+		const input = await req.body<{ name?: string }>();
+
+		if (!input || !input.name || !input.name.trim()) {
+			return res.send(400, 'TODO: port over validation lib');
+		}
+
 		// @ts-ignore - todo(worktop)
 		const user = req.user as User.User;
-		//
+		const doc = await Space.insert({ name }, user);
+		if (!doc) return res.send(500, 'Error creating document');
+
+		const output = Space.output(doc);
+		res.send(201, output);
 	}
 );
 
@@ -56,10 +66,18 @@ export const update = compose(
 	User.authenticate,
 	Space.isAuthorized,
 	async function (req, res) {
-		// @ts-ignore - todo(worktop)
-		const user = req.user as User.User;
+		const input = await req.body<{ name?: string }>();
+
+		if (!input || !input.name || !input.name.trim()) {
+			return res.send(400, 'TODO: port over validation lib');
+		}
+
 		// @ts-ignore - todo(worktop)
 		const space = req.space as Space.Space;
+		const doc = await Space.update(space, { name });
+
+		if (doc) res.send(200, Space.output(doc));
+		else res.send(500, 'Error updating document');
 	}
 );
 
@@ -73,8 +91,8 @@ export const destroy = compose(
 	Space.isAuthorized,
 	async function (req, res) {
 		// @ts-ignore - todo(worktop)
-		const user = req.user as User.User;
-		// @ts-ignore - todo(worktop)
-		const space = req.space as Space.Space;
+		const doc = req.space as Space.Space;
+		if (await Space.destroy(doc)) res.send(204);
+		else res.send(500, 'Error while destroying Space');
 	}
 );

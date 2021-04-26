@@ -50,6 +50,68 @@ export function save(doc: Space): Promise<boolean> {
 }
 
 /**
+ * Create a new `Space` document for a User
+ * @NOTE Handles its own `uid` value/uniqueness.
+ */
+export async function insert(values: { name: string }, user: User): Promise<Space|void> {
+	const doc: Space = {
+		// Create new `UserID`s until available
+		uid: await keys.until(ID.toUID, find),
+		name: values.name.trim(),
+		created_at: Date.now(),
+		last_updated: null,
+		ownerid: {
+			type: 'user',
+			uid: user.uid,
+		}
+	};
+
+	// Create the new record
+	if (!await save(doc)) return;
+
+	// TODO: update owner key count
+	// TODO: update Stripe quantity
+
+	return doc;
+}
+
+/**
+ * Update a `Space` document with the given `changes`.
+ * @NOTE Only the `name` can be changed.
+ */
+export async function update(space: Space, changes: { name?: string }): Promise<Space|false> {
+	// NOTE: a
+	changes.name = (changes.name || '').trim();
+	if (space.name === changes.name) return space;
+	if (!changes.name.length) return space;
+
+	// Explicitly choose properties to update
+	// ~> AKA, do not allow `uid` or `created_at` updates
+	space.last_updated = Date.now();
+	space.name = changes.name;
+
+	if (!await save(space)) return false;
+
+	return space;
+}
+
+/**
+ * Destroy a `Space` document.
+ * @IMPORTANT Consumer must run ownership check.
+ */
+export async function destroy(doc: Space): Promise<boolean> {
+	const key = ID.toKID(doc.uid);
+	const bool = await database.remove(key);
+
+	if (bool) {
+		// TODO: update owner key count
+		// TODO: update Stripw quantity
+	}
+
+	return bool;
+}
+
+/**
  * Format a `Space` document for public display
  * @NOTE Ensures `ownerid` is never public!
  */
