@@ -62,3 +62,19 @@ export const load: Handler<{ suid: SpaceID | string }> = async function (req, re
 	// @ts-ignore - todo(worktop)
 	req.space = doc;
 }
+
+/**
+ * User Authorization Middleware.
+ * Determine if the `req.user` is allowed to access the `req.space` document.
+ */
+export const isAuthorized: Handler = function (req, res) {
+	// @ts-ignore - todo(worktop)
+	const { user, space } = req as {
+		user: User; space: Space;
+	};
+
+	// TODO: show 404 instead?
+	if (space.ownerid.uid !== user.uid) {
+		return res.send(403);
+	}
+}

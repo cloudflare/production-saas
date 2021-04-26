@@ -36,6 +36,7 @@ export const create = compose(
 export const show = compose(
 	Space.load,
 	User.authenticate,
+	Space.isAuthorized,
 	function (req, res) {
 		// @ts-ignore - todo(worktop)
 		const space = req.space as Space.Space;
@@ -50,6 +51,7 @@ export const show = compose(
 export const update = compose(
 	Space.load,
 	User.authenticate,
+	Space.isAuthorized,
 	async function (req, res) {
 		// @ts-ignore - todo(worktop)
 		const user = req.user as User.User;
@@ -65,6 +67,7 @@ export const update = compose(
 export const destroy = compose(
 	Space.load,
 	User.authenticate,
+	Space.isAuthorized,
 	async function (req, res) {
 		// @ts-ignore - todo(worktop)
 		const user = req.user as User.User;
