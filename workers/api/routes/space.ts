@@ -6,19 +6,22 @@ import type { SpaceID } from 'lib/models/space';
 
 /**
  * GET /spaces
- * @NOTE Requires Authentication
+ * @requires Authentication
  */
 export const list = compose(
 	User.authenticate,
 	async function (req, res) {
 		// @ts-ignore - todo(worktop)
 		const user = req.user as User.User;
+		const arr = await Space.list(user);
+		const items = arr.map(Space.output);
+		res.send(200, items);
 	}
 );
 
 /**
  * POST /spaces
- * @NOTE Requires Authentication
+ * @requires Authentication
  */
 export const create = compose(
 	User.authenticate,
@@ -31,7 +34,7 @@ export const create = compose(
 
 /**
  * GET /spaces/:uid
- * @NOTE Requires Authentication
+ * @requires Authentication,Ownership
  */
 export const show = compose(
 	Space.load,
@@ -46,7 +49,7 @@ export const show = compose(
 
 /**
  * PUT /spaces/:uid
- * @NOTE Requires Authentication
+ * @requires Authentication,Ownership
  */
 export const update = compose(
 	Space.load,
@@ -62,7 +65,7 @@ export const update = compose(
 
 /**
  * DELETE /spaces/:uid
- * @NOTE Requires Authentication
+ * @requires Authentication,Ownership
  */
 export const destroy = compose(
 	Space.load,

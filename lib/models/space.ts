@@ -23,12 +23,23 @@ export interface Space {
 
 export const ID = keys.factory<SpaceID>('spaces', 11);
 
+// Construct the "owners::" KeyID for KV
+export const toOwnerKID = (userid: UserID) => `owners::user:${userid}` as keys.KeyID;
+
 /**
  * Find a `Space` document by its `uid` value.
  */
 export function find(uid: SpaceID) {
 	const key = ID.toKID(uid);
 	return database.read<Space>(key);
+}
+
+/**
+ * Find all `Space` documents owned by the `User`.
+ */
+export function list(user: User): Promise<Space[]> {
+	const key = toOwnerKID(user.uid);
+	return database.read<Space[]>(key).then(x => x || []);
 }
 
 /**
