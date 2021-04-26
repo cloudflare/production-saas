@@ -130,3 +130,22 @@ export async function tokenize(user: User) {
 	const token = await JWT.sign(user);
 	return { user: output(user), token };
 }
+
+/**
+ * Exchange a JWT for a `User` document, if valid.
+ * @NOTE Does not handle `JWT.verify` errors!
+ * @param token The incoming JWT token
+ */
+export async function identify(token: string): Promise<User|void> {
+	const { uid, salt } = await JWT.verify(token);
+
+	// Does `user.uid` exist?
+	const user = await find(uid);
+	if (!user) throw JWT.INVALID;
+
+	// NOTE: user salt changes w/ password
+	// AKA, mismatched salt is forgery or pre-reset token
+	if (user.salt !== salt) throw JWT.INVALID;
+
+	return user;
+}
