@@ -34,9 +34,12 @@ export const create = compose(
  * @NOTE Requires Authentication
  */
 export const show = compose(
+	Space.load,
 	User.authenticate,
 	function (req, res) {
 		// @ts-ignore - todo(worktop)
+		const space = req.space as Space.Space;
+		res.send(200, Space.output(space));
 	}
 );
 
@@ -45,6 +48,7 @@ export const show = compose(
  * @NOTE Requires Authentication
  */
 export const update = compose(
+	Space.load,
 	User.authenticate,
 	async function (req, res) {
 		// @ts-ignore - todo(worktop)
@@ -59,6 +63,7 @@ export const update = compose(
  * @NOTE Requires Authentication
  */
 export const destroy = compose(
+	Space.load,
 	User.authenticate,
 	async function (req, res) {
 		// @ts-ignore - todo(worktop)
