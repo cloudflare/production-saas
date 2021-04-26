@@ -1,3 +1,4 @@
+import { compose } from 'worktop';
 import * as Email from 'lib/models/email';
 import * as Password from 'lib/models/password';
 import * as User from 'lib/models/user';
@@ -57,6 +58,20 @@ export const login: Handler = async (req, res) => {
 	const output = await User.tokenize(user);
 	res.send(200, output);
 }
+
+/**
+ * POST /auth/refresh
+ * Exchange a valid JWT for new JWT and `User` data
+ */
+export const refresh: Handler = compose(
+	User.authenticate,
+	async (req, res) => {
+		// @ts-ignore – TODO(worktop)
+		const user = req.user as User.User;
+		const output = await User.tokenize(user);
+		res.send(200, output);
+	}
+);
 
 /**
  * POST /auth/forgot

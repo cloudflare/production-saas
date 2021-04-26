@@ -171,6 +171,7 @@ export const authenticate: Handler = async function (req, res) {
 		return res.send(401, err.message);
 	}
 
-	// @ts-ignore - TODO(worktop) https://github.com/lukeed/worktop/issues/7
+	// @ts-ignore
+	// TODO(worktop) https://github.com/lukeed/worktop/issues/7
 	req.user = user;
 }

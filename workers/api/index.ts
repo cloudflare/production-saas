@@ -16,6 +16,7 @@ API.prepare = CORS.preflight({
 
 API.add('POST', '/auth/login', Auth.login);
 API.add('POST', '/auth/register', Auth.register);
+API.add('POST', '/auth/refresh', Auth.refresh);
 API.add('POST', '/auth/forgot', Auth.forgot);
 API.add('POST', '/auth/reset', Auth.reset);
 
