@@ -25,7 +25,9 @@ export const register: Handler = async (req, res) => {
 
 	const user = await User.insert({ email, password });
 	if (!user) return res.send(500, 'Error creating account');
-	res.send(201, User.output(user));
+
+	const output = await User.tokenize(user);
+	res.send(201, output);
 }
 
 /**
@@ -52,8 +54,8 @@ export const login: Handler = async (req, res) => {
 	const isMatch = await Password.compare(user, password);
 	if (!isMatch) return res.send(401, ambiguous);
 
-	// TODO: { user, token }
-	res.send(200, User.output(user));
+	const output = await User.tokenize(user);
+	res.send(200, output);
 }
 
 /**
@@ -112,8 +114,8 @@ export const reset: Handler = async (req, res) => {
 
 	// regenerate salt
 	user = await User.update(user, { password });
+	if (!user) return res.send(500, 'Error updating user document');
 
-	// TODO: { user, token }
-	if (user) res.send(200, User.output(user));
-	else res.send(500, 'Error updating user document');
+	const output = await User.tokenize(user);
+	res.send(200, output);
 }
