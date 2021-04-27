@@ -23,8 +23,8 @@ API.add('POST', '/auth/reset', Auth.reset);
 
 API.add('GET', '/spaces', Space.list);
 API.add('POST', '/spaces', Space.create);
-API.add('GET', '/spaces/:suid', Space.show);
-API.add('PUT', '/spaces/:suid', Space.update);
-API.add('DELETE', '/spaces/:suid', Space.destroy);
+API.add('GET', '/spaces/:spaceid', Space.show);
+API.add('PUT', '/spaces/:spaceid', Space.update);
+API.add('DELETE', '/spaces/:spaceid', Space.destroy);
 
 Cache.listen(API.run);

@@ -124,12 +124,12 @@ export function output(doc: Space) {
  * Middleware to load a `Space` document.
  * Asserts the `suid` looks right before touching KV.
  */
-export const load: Handler<{ suid: SpaceID | string }> = async function (req, res) {
-	if (!ID.isUID(req.params.suid)) {
+export const load: Handler<{ spaceid: SpaceID | string }> = async function (req, res) {
+	if (!ID.isUID(req.params.spaceid)) {
 		return res.send(400, 'Invalid Space identifier');
 	}
 
-	const doc = await find(req.params.suid);
+	const doc = await find(req.params.spaceid);
 	if (!doc) return res.send(404, 'Space not found');
 
 	// @ts-ignore - todo(worktop)
