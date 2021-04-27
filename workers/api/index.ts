@@ -5,7 +5,7 @@ import * as CORS from 'worktop/cors';
 
 // Routes
 import * as Auth from './routes/auth';
-import * as Space from './routes/space';
+import * as Spaces from './routes/spaces';
 
 const API = new Router;
 
@@ -21,10 +21,10 @@ API.add('POST', '/auth/refresh', Auth.refresh);
 API.add('POST', '/auth/forgot', Auth.forgot);
 API.add('POST', '/auth/reset', Auth.reset);
 
-API.add('GET', '/spaces', Space.list);
-API.add('POST', '/spaces', Space.create);
-API.add('GET', '/spaces/:spaceid', Space.show);
-API.add('PUT', '/spaces/:spaceid', Space.update);
-API.add('DELETE', '/spaces/:spaceid', Space.destroy);
+API.add('GET', '/spaces', Spaces.list);
+API.add('POST', '/spaces', Spaces.create);
+API.add('GET', '/spaces/:spaceid', Spaces.show);
+API.add('PUT', '/spaces/:spaceid', Spaces.update);
+API.add('DELETE', '/spaces/:spaceid', Spaces.destroy);
 
 Cache.listen(API.run);
