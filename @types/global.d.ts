@@ -1,5 +1,6 @@
 declare type TODO = any;
 declare type Nullable<T> = T | null;
+declare type Dict<T> = Record<string, T>;
 
 // AKA: Date.now() format
 declare type TIMESTAMP = number;
