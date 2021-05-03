@@ -7,7 +7,6 @@ import * as Email from './email';
 import type { Handler } from 'worktop';
 import type { UID } from 'worktop/utils';
 import type { SALT, PASSWORD } from 'lib/models/password';
-import type { KeyID } from 'lib/utils/keys';
 
 export type UserID = UID<16>;
 
@@ -30,7 +29,7 @@ export interface Credentials {
 
 // ID helpers to normalize ID types/values
 export const toUID = () => keys.gen(16) as UserID;
-export const toKID = (uid: UserID) => `users::${uid}` as KeyID;
+export const toKID = (uid: UserID) => `users::${uid}`;
 export const isUID = (x: string | UserID): x is UserID => x.length === 16;
 
 /**

@@ -1,17 +1,16 @@
 import * as DB from 'worktop/kv';
-import type { KeyID } from 'lib/utils/keys';
 import type { KV } from 'worktop/kv';
 
 // TODO(worktop): add expiration settings
-export function write<T>(key: KeyID, value: T): Promise<boolean> {
+export function write<T>(key: string, value: T): Promise<boolean> {
 	return DB.write(DATABASE, key, value, true);
 }
 
-export function read<T>(key: KeyID): Promise<T|false> {
+export function read<T>(key: string): Promise<T|false> {
 	return DB.read<T>(DATABASE, key, 'json');
 }
 
-export function remove(key: KeyID): Promise<boolean> {
+export function remove(key: string): Promise<boolean> {
 	return DB.remove(DATABASE, key);
 }
 

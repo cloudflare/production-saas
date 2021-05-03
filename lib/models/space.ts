@@ -4,7 +4,6 @@ import * as database from 'lib/utils/database';
 import type { Handler } from 'worktop';
 import type { UID } from 'worktop/utils';
 import type { User, UserID } from './user';
-import type { KeyID } from 'lib/utils/keys';
 
 export type SpaceID = UID<11>;
 
@@ -24,11 +23,11 @@ export interface Space {
 
 // ID helpers to normalize ID types/values
 export const toUID = () => keys.gen(11) as SpaceID;
-export const toKID = (uid: SpaceID) => `spaces::${uid}` as KeyID;
+export const toKID = (uid: SpaceID) => `spaces::${uid}`;
 export const isUID = (x: SpaceID|string): x is SpaceID => x.length === 11;
 
 // Construct the "owners::" KeyID for KV
-export const toOwnerKID = (userid: UserID) => `owners::user:${userid}` as keys.KeyID;
+export const toOwnerKID = (userid: UserID) => `owners::user:${userid}`;
 
 /**
  * Find a `Space` document by its `uid` value.

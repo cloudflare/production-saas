@@ -5,7 +5,6 @@ import * as keys from 'lib/utils/keys';
 
 import type { UID } from 'worktop/utils';
 import type { User, UserID } from 'lib/models/user';
-import type { KeyID } from 'lib/utils/keys';
 
 export type SALT = UID<128>;
 export type PASSWORD = UID<64>;
@@ -45,7 +44,7 @@ export async function prepare(password: string) {
 
 // NOTE: "reset::{token}" keys point to `User.uid` values
 export const toUID = () => keys.gen(100) as TOKEN;
-export const toKID = (token: TOKEN) => `reset::${token}` as KeyID;
+export const toKID = (token: TOKEN) => `reset::${token}`;
 export const isUID = (x: TOKEN | string): x is TOKEN => x.length === 100;
 
 /**
