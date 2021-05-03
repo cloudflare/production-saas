@@ -7,6 +7,7 @@ import * as Email from './email';
 import type { Handler } from 'worktop';
 import type { UID } from 'worktop/utils';
 import type { SALT, PASSWORD } from 'lib/models/password';
+import type { KeyID } from 'lib/utils/keys';
 
 export type UserID = UID<16>;
 
@@ -27,14 +28,16 @@ export interface Credentials {
 	password: string;
 }
 
-// TODO?: mark as pure
-export const ID = keys.factory<UserID>('users', 16);
+// ID helpers to normalize ID types/values
+export const toUID = () => keys.gen(16) as UserID;
+export const toKID = (uid: UserID) => `users::${uid}` as KeyID;
+export const isUID = (x: string | UserID): x is UserID => x.length === 16;
 
 /**
  * Find a `User` document by its `uid` value.
  */
 export function find(uid: UserID) {
-	const key = ID.toKID(uid);
+	const key = toKID(uid);
 	return database.read<User>(key);
 }
 
@@ -42,7 +45,8 @@ export function find(uid: UserID) {
  * Save/Overwrite the `User` document.
  */
 export function save(user: User): Promise<boolean> {
-	return database.write<User>(ID.toKID(user.uid), user);
+	const key = toKID(user.uid);
+	return database.write<User>(key, user);
 }
 
 /**
@@ -56,7 +60,7 @@ export async function insert(values: Credentials): Promise<User|void> {
 
 	const user: User = {
 		// Create new `UserID`s until available
-		uid: await keys.until(ID.toUID, find),
+		uid: await keys.until(toUID, find),
 		created_at: Date.now(),
 		last_updated: null,
 		email: values.email,

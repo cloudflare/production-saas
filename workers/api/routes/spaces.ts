@@ -2,8 +2,6 @@ import { compose } from 'worktop';
 import * as User from 'lib/models/user';
 import * as Space from 'lib/models/space';
 
-import type { SpaceID } from 'lib/models/space';
-
 /**
  * GET /spaces
  * @requires Authentication
@@ -43,7 +41,7 @@ export const create = compose(
 );
 
 /**
- * GET /spaces/:uid
+ * GET /spaces/:spaceid
  * @requires Authentication,Ownership
  */
 export const show = compose(
@@ -58,7 +56,7 @@ export const show = compose(
 );
 
 /**
- * PUT /spaces/:uid
+ * PUT /spaces/:spaceid
  * @requires Authentication,Ownership
  */
 export const update = compose(
@@ -82,7 +80,7 @@ export const update = compose(
 );
 
 /**
- * DELETE /spaces/:uid
+ * DELETE /spaces/:spaceid
  * @requires Authentication,Ownership
  */
 export const destroy = compose(

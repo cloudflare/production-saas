@@ -5,6 +5,7 @@ import * as keys from 'lib/utils/keys';
 
 import type { UID } from 'worktop/utils';
 import type { User, UserID } from 'lib/models/user';
+import type { KeyID } from 'lib/utils/keys';
 
 export type SALT = UID<128>;
 export type PASSWORD = UID<64>;
@@ -43,14 +44,16 @@ export async function prepare(password: string) {
 }
 
 // NOTE: "reset::{token}" keys point to `User.uid` values
-export const RESET = keys.factory<TOKEN>('reset', 100);
+export const toUID = () => keys.gen(100) as TOKEN;
+export const toKID = (token: TOKEN) => `reset::${token}` as KeyID;
+export const isUID = (x: TOKEN | string): x is TOKEN => x.length === 100;
 
 /**
  * Check if the `reset::{token}` document exists.
  * @NOTE Only exists if a "Password Reset" initiated within 7 days.
  */
 export function find(token: TOKEN) {
-	const key = RESET.toKID(token);
+	const key = toKID(token);
 	return database.read<UserID>(key);
 }
 
@@ -60,13 +63,13 @@ export function find(token: TOKEN) {
  */
 export async function forgot(user: User): Promise<boolean> {
 	// Create new TOKENs until find unused value
-	const token = await keys.until(RESET.toUID, find);
+	const token = await keys.until(toUID, find);
 
 	// Persist the TOKEN value to storage; auto-expire after 12 hours
 	const value = JSON.stringify(user.uid);
 	const expirationTtl = 12 * 60 * 60; // seconds
 	// TODO(worktop): add expiration settings to `write` util
-	await DATABASE.put(RESET.toKID(token), value, { expirationTtl });
+	await DATABASE.put(toKID(token), value, { expirationTtl });
 
 	// TODO: send email to `user.email` with reset link
 

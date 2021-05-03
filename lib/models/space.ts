@@ -4,6 +4,7 @@ import * as database from 'lib/utils/database';
 import type { Handler } from 'worktop';
 import type { UID } from 'worktop/utils';
 import type { User, UserID } from './user';
+import type { KeyID } from 'lib/utils/keys';
 
 export type SpaceID = UID<11>;
 
@@ -21,7 +22,10 @@ export interface Space {
 	last_updated?: Nullable<TIMESTAMP>;
 }
 
-export const ID = keys.factory<SpaceID>('spaces', 11);
+// ID helpers to normalize ID types/values
+export const toUID = () => keys.gen(11) as SpaceID;
+export const toKID = (uid: SpaceID) => `spaces::${uid}` as KeyID;
+export const isUID = (x: SpaceID|string): x is SpaceID => x.length === 11;
 
 // Construct the "owners::" KeyID for KV
 export const toOwnerKID = (userid: UserID) => `owners::user:${userid}` as keys.KeyID;
@@ -30,7 +34,7 @@ export const toOwnerKID = (userid: UserID) => `owners::user:${userid}` as keys.K
  * Find a `Space` document by its `uid` value.
  */
 export function find(uid: SpaceID) {
-	const key = ID.toKID(uid);
+	const key = toKID(uid);
 	return database.read<Space>(key);
 }
 
@@ -46,7 +50,8 @@ export function list(user: User): Promise<Space[]> {
  * Save/Overwrite the `Space` document.
  */
 export function save(doc: Space): Promise<boolean> {
-	return database.write<Space>(ID.toKID(doc.uid), doc);
+	const key = toKID(doc.uid);
+	return database.write<Space>(key, doc);
 }
 
 /**
@@ -55,8 +60,8 @@ export function save(doc: Space): Promise<boolean> {
  */
 export async function insert(values: { name: string }, user: User): Promise<Space|void> {
 	const doc: Space = {
-		// Create new `UserID`s until available
-		uid: await keys.until(ID.toUID, find),
+		// Create new `SpaceID`s until available
+		uid: await keys.until(toUID, find),
 		name: values.name.trim(),
 		created_at: Date.now(),
 		last_updated: null,
@@ -100,7 +105,7 @@ export async function update(space: Space, changes: { name?: string }): Promise<
  * @IMPORTANT Consumer must run ownership check.
  */
 export async function destroy(doc: Space): Promise<boolean> {
-	const key = ID.toKID(doc.uid);
+	const key = toKID(doc.uid);
 	const bool = await database.remove(key);
 
 	if (bool) {
@@ -125,7 +130,7 @@ export function output(doc: Space) {
  * Asserts the `suid` looks right before touching KV.
  */
 export const load: Handler<{ spaceid: SpaceID | string }> = async function (req, res) {
-	if (!ID.isUID(req.params.spaceid)) {
+	if (!isUID(req.params.spaceid)) {
 		return res.send(400, 'Invalid Space identifier');
 	}
 
