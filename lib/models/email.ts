@@ -1,10 +1,9 @@
 import * as database from 'lib/utils/database';
 
-import type { KeyID } from 'lib/utils/keys';
 import type { User, UserID } from './user';
 
 // NOTE: "emails::{email}" keys point to `User.uid` values
-export const toKID = (email: string) => `emails::${email}` as KeyID;
+export const toKID = (email: string) => `emails::${email}`;
 
 /**
  * Find the `UserID` associated with an `User.email` value.
