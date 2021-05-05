@@ -25,8 +25,9 @@ export const create = compose(
 	User.authenticate,
 	async function (req, res) {
 		const input = await req.body<{ name?: string }>();
+		const name = input && input.name && input.name.trim();
 
-		if (!input || !input.name || !input.name.trim()) {
+		if (!name) {
 			return res.send(400, 'TODO: port over validation lib');
 		}
 
@@ -65,8 +66,9 @@ export const update = compose(
 	Space.isAuthorized,
 	async function (req, res) {
 		const input = await req.body<{ name?: string }>();
+		const name = input && input.name && input.name.trim();
 
-		if (!input || !input.name || !input.name.trim()) {
+		if (!name) {
 			return res.send(400, 'TODO: port over validation lib');
 		}
 
