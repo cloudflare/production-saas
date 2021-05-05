@@ -114,7 +114,7 @@ export const reset: Handler = async (req, res) => {
 	const ambiguous = 'Invalid token';
 	const { token, email, password } = input;
 
-	const isValid = Password.RESET.isUID(token);
+	const isValid = Password.isUID(token);
 	if (!isValid) return res.send(400, ambiguous);
 
 	const userid = await Password.find(token);
