@@ -28,9 +28,7 @@ export function hash(password: string, salt: SALT): Promise<PASSWORD> {
  * Determine if the incoming `password` matches the `User.password` value.
  */
 export async function compare(user: User, password: PASSWORD|string): Promise<boolean> {
-	if (password.length !== 64) return false;
-	const local = await hash(user.password, user.salt);
-	return local === password;
+	return await hash(password, user.salt) === user.password;
 }
 
 /**
