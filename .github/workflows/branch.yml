@@ -13,6 +13,10 @@ on:
     tags-ignore:
       - '**'
 
+env:
+  CLOUDFLARE_ACCOUNTID: ${{ secrets.CLOUDFLARE_ACCOUNTID }}
+  CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
+
 jobs:
   test:
     name: Node.js v14
@@ -44,3 +48,8 @@ jobs:
 
     - name: Compiles
       run: pnpm run build
+
+    # temporary
+    - name: Deploy
+      if: ${{ github.ref == 'refs/heads/main' }}
+      run: pnpm run deploy
