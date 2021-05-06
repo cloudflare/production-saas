@@ -7,13 +7,8 @@ on:
     tags-ignore:
       - '**'
 
-  pull_request:
-    branches:
-      - '**'
-    tags-ignore:
-      - '**'
-
 env:
+  SENDGRID_TOKEN: ${{ secrets.SENDGRID_TOKEN }}
   CLOUDFLARE_ZONEID: ${{ secrets.CLOUDFLARE_ZONEID }}
   CLOUDFLARE_ACCOUNTID: ${{ secrets.CLOUDFLARE_ACCOUNTID }}
   CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
