@@ -13,3 +13,7 @@ declare type Input<T> = Omit<T, 'uid'|'created_at'|'last_updated'>;
  */
 declare const DATABASE: import('worktop/kv').KV.Namespace;
 declare const JWT_SECRET: string;
+
+declare const SENDGRID_TOKEN: string; // API token
+declare const SENDGRID_EMAIL: string; // from: email address
+declare const SENDGRID_NAME: string; // from: display name
