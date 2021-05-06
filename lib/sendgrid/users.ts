@@ -15,3 +15,17 @@ export function welcome(user: User) {
 		firstname
 	});
 }
+
+/**
+ * Send the "your email changed" email
+ */
+export function contact(address: string) {
+	return email('new.email', 'd-34320639ad42459a851b946fe1eadfe8', { email: address });
+}
+
+/**
+ * Send the "your password changed" email
+ */
+export function password(address: string) {
+	return email('new.password', 'd-fc893c19238a46fc8554a15766d66f84', { email: address });
+}

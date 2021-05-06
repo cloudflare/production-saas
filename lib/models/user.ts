@@ -106,15 +106,18 @@ export async function update(user: User, changes: UserChanges): Promise<User|fal
 	if (!await save(user)) return false;
 
 	if (user.email !== prevEmail) {
-		// TODO: send "email changed" emails
 		await Promise.all([
 			Email.remove(prevEmail),
 			Email.save(user),
 		]);
+
+		// Send "email changed" alert
+		await emails.contact(prevEmail);
 	}
 
 	if (hasPassword) {
-		// TODO: send "password changed" email
+		// send "password changed" alert
+		await emails.password(prevEmail);
 	}
 
 	return user;
