@@ -86,7 +86,7 @@ export async function insert(values: Credentials): Promise<User|void> {
  * @TODO Implement email sender for email/password changes.
  */
 type UserChanges = Partial<Omit<User, 'password'> & { password: string }>;
-export async function update(user: User, changes: UserChanges): Promise<User|false> {
+export async function update(user: User, changes: UserChanges): Promise<User|void> {
 	const hasPassword = changes.password && changes.password !== user.password;
 	const prevEmail = user.email;
 
@@ -103,7 +103,7 @@ export async function update(user: User, changes: UserChanges): Promise<User|fal
 		user.salt = sanitized.salt;
 	}
 
-	if (!await save(user)) return false;
+	if (!await save(user)) return;
 
 	if (user.email !== prevEmail) {
 		await Promise.all([

@@ -62,11 +62,8 @@ export async function forgot(user: User): Promise<boolean> {
 	// Create new TOKENs until find unused value
 	const token = await keys.until(toUID, find);
 
-	// Persist the TOKEN value to storage; auto-expire after 12 hours
-	const value = JSON.stringify(user.uid);
-	const expirationTtl = 12 * 60 * 60; // seconds
-	// TODO(worktop): add expiration settings to `write` util
-	await DATABASE.put(toKID(token), value, { expirationTtl });
+	// Persist the TOKEN value to storage; auto-expire after 12 hours (in secs)
+	await database.write(toKID(token), user.uid, { expirationTtl: 12 * 60 * 60 });
 
 	// TODO: send email to `user.email` with reset link
 
