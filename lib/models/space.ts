@@ -1,22 +1,17 @@
 import * as keys from 'lib/utils/keys';
 import * as database from 'lib/utils/database';
+import * as Owner from './owner';
 
 import type { Handler } from 'worktop';
 import type { UID } from 'worktop/utils';
-import type { User, UserID } from './user';
+import type { User } from './user';
 
 export type SpaceID = UID<11>;
-
-// TODO: Maybe Org
-type Owner = {
-	type: 'user';
-	uid: UserID;
-}
 
 export interface Space {
 	uid: SpaceID;
 	name: string;
-	ownerid: Owner;
+	owner: Owner.Owner;
 	created_at: TIMESTAMP;
 	last_updated?: Nullable<TIMESTAMP>;
 }
@@ -25,9 +20,6 @@ export interface Space {
 export const toUID = () => keys.gen(11) as SpaceID;
 export const toKID = (uid: SpaceID) => `spaces::${uid}`;
 export const isUID = (x: SpaceID|string): x is SpaceID => x.length === 11;
-
-// Construct the "owners::" KeyID for KV
-export const toOwnerKID = (userid: UserID) => `owners::user:${userid}`;
 
 /**
  * Find a `Space` document by its `uid` value.
@@ -41,7 +33,7 @@ export function find(uid: SpaceID) {
  * Find all `Space` documents owned by the `User`.
  */
 export function list(user: User): Promise<Space[]> {
-	const key = toOwnerKID(user.uid);
+	const key = Owner.toKID({ type: 'user', uid: user.uid });
 	return database.read<Space[]>(key).then(x => x || []);
 }
 
@@ -64,7 +56,7 @@ export async function insert(values: { name: string }, user: User): Promise<Spac
 		name: values.name.trim(),
 		created_at: Date.now(),
 		last_updated: null,
-		ownerid: {
+		owner: {
 			type: 'user',
 			uid: user.uid,
 		}
@@ -117,7 +109,7 @@ export async function destroy(doc: Space): Promise<boolean> {
 
 /**
  * Format a `Space` document for public display
- * @NOTE Ensures `ownerid` is never public!
+ * @NOTE Ensures `owner` is never public!
  */
 export function output(doc: Space) {
 	const { uid, name, created_at, last_updated } = doc;
@@ -151,7 +143,7 @@ export const isAuthorized: Handler = function (req, res) {
 	};
 
 	// TODO: show 404 instead?
-	if (space.ownerid.uid !== user.uid) {
+	if (space.owner.uid !== user.uid) {
 		return res.send(403);
 	}
 }
