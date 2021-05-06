@@ -2,7 +2,7 @@ import * as JWT from 'lib/utils/jwt';
 import * as keys from 'lib/utils/keys';
 import * as Password from 'lib/models/password';
 import * as database from 'lib/utils/database';
-import { welcome } from 'lib/sendgrid/users';
+import * as emails from 'lib/sendgrid/users';
 import * as Email from './email';
 
 import type { Handler } from 'worktop';
@@ -74,11 +74,8 @@ export async function insert(values: Credentials): Promise<User|void> {
 	// Create public-facing "emails::" key for login
 	if (!await Email.save(user)) return;
 
-	try {
-		await welcome(user);
-	} catch (err) {
-		console.log('[TODO] report emails.welcome error');
-	}
+	// Send "welcome" email
+	await emails.welcome(user);
 
 	return user;
 }

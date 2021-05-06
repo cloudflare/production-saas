@@ -14,7 +14,7 @@ const FROM: Recipient = {
 /**
  * The base API interaction
  */
-export function email(templateid: string, recipient: Recipient, inject: Dict<string> = {}) {
+export function email(label: string, templateid: string, recipient: Recipient, inject: Dict<string> = {}) {
 	return fetch('https://api.sendgrid.com/v3/mail/send', {
 		method: 'POST',
 		headers: {
@@ -40,5 +40,11 @@ export function email(templateid: string, recipient: Recipient, inject: Dict<str
 				dynamic_template_data: inject
 			}]
 		})
+	}).then(r => {
+		if (r.ok) return;
+		// TODO: Attach proper error logging service
+		return r.text().then(text => {
+			console.error('[EMAIL] Error sending "%s" to "%s" :: %s', label, recipient.email, text);
+		});
 	});
 }
