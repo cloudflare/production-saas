@@ -11,9 +11,19 @@ export const list = compose(
 	async function (req, res) {
 		// @ts-ignore - todo(worktop)
 		const user = req.user as User.User;
-		const arr = await Space.list(user);
-		const items = arr.map(Space.output);
-		res.send(200, items);
+		const IDs = await Space.list(user);
+		const rows = await Promise.all(
+			IDs.map(Space.find)
+		);
+
+		let i=0, output=[];
+		for (; i < rows.length; i++) {
+			if (rows[i]) output.push(
+				Space.output(rows[i] as Space.Space)
+			);
+		}
+
+		res.send(200, output);
 	}
 );
 
@@ -91,8 +101,11 @@ export const destroy = compose(
 	Space.isAuthorized,
 	async function (req, res) {
 		// @ts-ignore - todo(worktop)
-		const doc = req.space as Space.Space;
-		if (await Space.destroy(doc)) res.send(204);
+		const { user, space } = req as {
+			space: Space.Space;
+			user: User.User;
+		};
+		if (await Space.destroy(space, user)) res.send(204);
 		else res.send(500, 'Error while destroying Space');
 	}
 );

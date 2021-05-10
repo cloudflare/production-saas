@@ -5,9 +5,15 @@ import * as database from 'lib/utils/database';
 import * as emails from 'lib/sendgrid/users';
 import * as Email from './email';
 
+import * as Prices from 'lib/stripe/prices';
+import * as Customers from 'lib/stripe/customers';
+import * as Subscriptions from 'lib/stripe/subscriptions';
+
 import type { Handler } from 'worktop';
 import type { UID } from 'worktop/utils';
 import type { SALT, PASSWORD } from 'lib/models/password';
+import type { Subscription } from 'lib/stripe/subscriptions';
+import type { Customer } from 'lib/stripe/customers';
 
 export type UserID = UID<16>;
 
@@ -20,6 +26,10 @@ export interface User {
 	lastname?: Nullable<string>;
 	created_at: TIMESTAMP;
 	last_updated?: Nullable<TIMESTAMP>;
+	stripe: {
+		customer: Customer['id'];
+		subscription: Subscription['id'];
+	};
 }
 
 // Authentication attributes
@@ -58,12 +68,36 @@ export async function insert(values: Credentials): Promise<User|void> {
 	// Generate a new salt & hash the original password
 	const { password, salt } = await Password.prepare(values.password);
 
+	// Create new `UserID`s until available
+	const nxtUID = await keys.until(toUID, find);
+
+	// Create the Stripe Customer record
+	const subscription = await Customers.create({
+		email: values.email,
+		metadata: {
+			userid: nxtUID,
+			users: 1,
+			documents: 0,
+			spaces: 0,
+		}
+	}).then(customer => {
+		if (customer) {
+			// Attach the FREE PLAN to the new customer
+			return Subscriptions.create(customer.id, [Prices.FREE.id]);
+		}
+	});
+
+	if (!subscription) return;
+
 	const user: User = {
-		// Create new `UserID`s until available
-		uid: await keys.until(toUID, find),
+		uid: nxtUID,
 		created_at: Date.now(),
 		last_updated: null,
 		email: values.email,
+		stripe: {
+			customer: subscription.customer,
+			subscription: subscription.id,
+		},
 		password,
 		salt,
 	};
@@ -81,6 +115,15 @@ export async function insert(values: Credentials): Promise<User|void> {
 }
 
 /**
+ * Format a User's full name
+ */
+export function fullname(user: User): string {
+	let name = user.firstname || '';
+	if (user.lastname) name += ' ' + user.lastname;
+	return name;
+}
+
+/**
  * Update a `User` document with the given `changes`.
  * @NOTE Handles `password`, `salt`, and `uid` values.
  * @TODO Implement email sender for email/password changes.
@@ -88,6 +131,7 @@ export async function insert(values: Credentials): Promise<User|void> {
 type UserChanges = Partial<Omit<User, 'password'> & { password: string }>;
 export async function update(user: User, changes: UserChanges): Promise<User|void> {
 	const hasPassword = changes.password && changes.password !== user.password;
+	const prevFullname = fullname(user);
 	const prevEmail = user.email;
 
 	// Explicitly choose properties to update
@@ -118,6 +162,14 @@ export async function update(user: User, changes: UserChanges): Promise<User|voi
 	if (hasPassword) {
 		// send "password changed" alert
 		await emails.password(prevEmail);
+	}
+
+	// Forward any display details to Stripe
+	if (user.email !== prevEmail || prevFullname !== fullname(user)) {
+		await Customers.update(user.stripe.customer, {
+			email: user.email,
+			name: fullname(user),
+		});
 	}
 
 	return user;

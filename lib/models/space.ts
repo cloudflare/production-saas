@@ -1,5 +1,6 @@
 import * as keys from 'lib/utils/keys';
 import * as database from 'lib/utils/database';
+import * as Customers from 'lib/stripe/customers';
 import * as Owner from './owner';
 
 import type { Handler } from 'worktop';
@@ -32,9 +33,25 @@ export function find(uid: SpaceID) {
 /**
  * Find all `Space` documents owned by the `User`.
  */
-export function list(user: User): Promise<Space[]> {
-	const key = Owner.toKID({ type: 'user', uid: user.uid });
-	return database.read<Space[]>(key).then(x => x || []);
+export function list(user: User): Promise<SpaceID[]> {
+	const owner = Owner.format('user', user.uid);
+	const ownerkey = Owner.toKID(owner, 'spaces');
+	return database.read<SpaceID[]>(ownerkey).then(arr => arr || []);
+}
+
+/**
+ * Synchronize the User's list of SpaceIDs
+ */
+export async function sync(user: User, list: SpaceID[]): Promise<boolean> {
+	const owner = Owner.format('user', user.uid);
+	const limits = await Owner.sync(owner, 'spaces', list);
+	if (!limits) return false;
+
+	const output = await Customers.update(user.stripe.customer,{
+		metadata: { ...limits, userid: user.uid }
+	});
+
+	return !!output;
 }
 
 /**
@@ -65,8 +82,9 @@ export async function insert(values: { name: string }, user: User): Promise<Spac
 	// Create the new record
 	if (!await save(doc)) return;
 
-	// TODO: update owner key count
-	// TODO: update Stripe quantity
+	// Update the owner's list of Spaces
+	const spaceIDs = (await list(user)).concat(doc.uid);
+	if (!await sync(user, spaceIDs)) return;
 
 	return doc;
 }
@@ -95,16 +113,21 @@ export async function update(space: Space, changes: { name?: string }): Promise<
  * Destroy a `Space` document.
  * @IMPORTANT Consumer must run ownership check.
  */
-export async function destroy(doc: Space): Promise<boolean> {
+export async function destroy(doc: Space, user: User): Promise<boolean> {
 	const key = toKID(doc.uid);
-	const bool = await database.remove(key);
+	if (!await database.remove(key)) return false;
 
-	if (bool) {
-		// TODO: update owner key count
-		// TODO: update Stripw quantity
-	}
+	// Get the owner's list of Spaces
+	const spaceIDs = await list(user);
+	const index = spaceIDs.indexOf(doc.uid);
 
-	return bool;
+	// NOTE: shouldn't happen
+	if (index === -1) return true;
+	spaceIDs.splice(index, 1);
+
+	// Sync counts with Stripe
+	// Sync counts/IDs with Owner key
+	return sync(user, spaceIDs);
 }
 
 /**

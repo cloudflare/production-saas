@@ -8,7 +8,7 @@ import type { User } from 'lib/models/user';
  */
 export function welcome(user: User) {
 	let firstname = user.firstname || 'Guest';
-	return email('welcome', 'd-b93ad7e5ffa94ea785adeba34300e0e6', {
+	return email('welcome', 'd-588add1d1843463d904c0d3e2bedadf8', {
 		email: user.email,
 		name: firstname,
 	}, {
@@ -20,12 +20,12 @@ export function welcome(user: User) {
  * Send the "your email changed" email
  */
 export function contact(address: string) {
-	return email('new.email', 'd-34320639ad42459a851b946fe1eadfe8', { email: address });
+	return email('new.email', 'd-343e97d7060143f4ba9580d4a10dcf5c', { email: address });
 }
 
 /**
  * Send the "your password changed" email
  */
 export function password(address: string) {
-	return email('new.password', 'd-fc893c19238a46fc8554a15766d66f84', { email: address });
+	return email('new.password', 'd-7e078ad44d6a43b3a8ee4d142ad7543b', { email: address });
 }

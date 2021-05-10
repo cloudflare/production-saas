@@ -12,6 +12,7 @@ declare type Input<T> = Omit<T, 'uid'|'created_at'|'last_updated'>;
  * VARS/BINDINGS (via wranger.toml)
  */
 declare const DATABASE: import('worktop/kv').KV.Namespace;
+declare const STRIPE_SECRET: string;
 declare const JWT_SECRET: string;
 
 declare const SENDGRID_TOKEN: string; // API token
