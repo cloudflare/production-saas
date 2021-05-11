@@ -7,6 +7,7 @@ import * as CORS from 'worktop/cors';
 import * as Auth from './routes/auth';
 import * as Users from './routes/users';
 import * as Schemas from './routes/schemas';
+import * as Documents from './routes/docs';
 import * as Spaces from './routes/spaces';
 
 const API = new Router;
@@ -28,6 +29,12 @@ API.add('POST', '/spaces', Spaces.create);
 API.add('GET', '/spaces/:spaceid', Spaces.show);
 API.add('PUT', '/spaces/:spaceid', Spaces.update);
 API.add('DELETE', '/spaces/:spaceid', Spaces.destroy);
+
+API.add('GET', '/spaces/:spaceid/documents', Documents.list);
+API.add('POST', '/spaces/:spaceid/documents', Documents.create);
+API.add('GET', '/spaces/:spaceid/documents/:docid', Documents.show);
+API.add('PUT', '/spaces/:spaceid/documents/:docid', Documents.update);
+API.add('DELETE', '/spaces/:spaceid/documents/:docid', Documents.destroy);
 
 API.add('GET', '/spaces/:spaceid/schemas', Schemas.list);
 API.add('POST', '/spaces/:spaceid/schemas', Schemas.create);

@@ -18,3 +18,9 @@ export function remove(key: string): Promise<boolean> {
 export function paginate(options?: Omit<Options.Paginate, 'metadata'>) {
 	return DB.paginate(DATABASE, options);
 }
+
+export function collect<T>(keys: string[]): Promise<T[]> {
+	return Promise.all(keys.map(read)).then(arr => {
+		return arr.filter(Boolean) as T[];
+	});
+}

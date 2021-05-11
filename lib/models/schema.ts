@@ -52,9 +52,10 @@ export function find(spaceid: SpaceID, uid: SchemaID) {
 export async function list(spaceid: SpaceID, options?: Pick<Options.Paginate, 'limit'|'page'>): Promise<Schema[]> {
 	// pass empty UID for `prefix` value only
 	const prefix = toKID(spaceid, '' as SchemaID);
-	// retrive the fully-formatted Key IDs (aka, KIDs)
+	// retrieve the fully-formatted Key IDs (aka, KIDs)
 	const keys = await database.paginate({ ...options, prefix });
-	return Promise.all(keys.map(database.read)) as Promise<Schema[]>;
+	// convert keys into complete documents
+	return database.collect<Schema>(keys);
 }
 
 /**
