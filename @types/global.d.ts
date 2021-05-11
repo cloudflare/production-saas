@@ -18,3 +18,22 @@ declare const JWT_SECRET: string;
 declare const SENDGRID_TOKEN: string; // API token
 declare const SENDGRID_EMAIL: string; // from: email address
 declare const SENDGRID_NAME: string; // from: display name
+
+// Add missing TypeScript definitions
+// NOTE: Exists in "dom.iterable" but this
+//       would bring other many other type errors
+//       that cannot live in agreement with "webworker".
+interface IterableCopy {
+	[Symbol.iterator](): IterableIterator<[string, string]>;
+	entries(): IterableIterator<[string, string]>;
+	keys(): IterableIterator<string>;
+	values(): IterableIterator<string>;
+}
+
+declare interface Headers extends IterableCopy {
+	//
+}
+
+declare interface URLSearchParams extends IterableCopy {
+	//
+}

@@ -78,6 +78,7 @@ export async function insert(values: Credentials): Promise<User|void> {
 			userid: nxtUID,
 			users: 1,
 			documents: 0,
+			schemas: 0,
 			spaces: 0,
 		}
 	}).then(customer => {

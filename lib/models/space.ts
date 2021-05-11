@@ -162,7 +162,8 @@ export const load: Handler<{ spaceid: SpaceID | string }> = async function (req,
 export const isAuthorized: Handler = function (req, res) {
 	// @ts-ignore - todo(worktop)
 	const { user, space } = req as {
-		user: User; space: Space;
+		space: Space;
+		user: User;
 	};
 
 	// TODO: show 404 instead?

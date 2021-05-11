@@ -56,9 +56,8 @@ export const create = compose(
  * @requires Authentication,Ownership
  */
 export const show = compose(
-	Space.load,
 	User.authenticate,
-	Space.isAuthorized,
+	Space.load, Space.isAuthorized,
 	function (req, res) {
 		// @ts-ignore - todo(worktop)
 		const space = req.space as Space.Space;
@@ -71,9 +70,8 @@ export const show = compose(
  * @requires Authentication,Ownership
  */
 export const update = compose(
-	Space.load,
 	User.authenticate,
-	Space.isAuthorized,
+	Space.load, Space.isAuthorized,
 	async function (req, res) {
 		const input = await req.body<{ name?: string }>();
 		const name = input && input.name && input.name.trim();
@@ -96,9 +94,8 @@ export const update = compose(
  * @requires Authentication,Ownership
  */
 export const destroy = compose(
-	Space.load,
 	User.authenticate,
-	Space.isAuthorized,
+	Space.load, Space.isAuthorized,
 	async function (req, res) {
 		// @ts-ignore - todo(worktop)
 		const { user, space } = req as {

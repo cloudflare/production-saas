@@ -1,2 +1,2 @@
-export { uid as gen } from 'worktop/utils';
+export { uid as gen, ulid } from 'worktop/utils';
 export { until } from 'worktop/kv';

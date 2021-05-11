@@ -24,6 +24,7 @@ export interface Product {
 export interface Limits {
 	users: number;
 	spaces: number;
+	schemas: number;
 	documents: number;
 }
 
@@ -33,6 +34,7 @@ export const FREE: Partial<Product> = {
 	metadata: {
 		users: 3,
 		spaces: 1,
+		schemas: 12,
 		documents: 1e3
 	}
 };
@@ -43,6 +45,7 @@ export const STARTUP: Partial<Product> = {
 	metadata: {
 		users: 10,
 		spaces: 5,
+		schemas: 48,
 		documents: 10e3
 	}
 };
@@ -53,6 +56,7 @@ export const UNLIMITED: Partial<Product> = {
 	metadata: {
 		users: Infinity,
 		spaces: Infinity,
+		schemas: Infinity,
 		documents: Infinity
 	}
 };

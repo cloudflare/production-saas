@@ -14,3 +14,7 @@ export function read<T>(key: string): Promise<T|void> {
 export function remove(key: string): Promise<boolean> {
 	return DB.remove(DATABASE, key);
 }
+
+export function paginate(options?: Omit<Options.Paginate, 'metadata'>) {
+	return DB.paginate(DATABASE, options);
+}
