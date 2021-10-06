@@ -1,12 +1,13 @@
-// @ts-ignore
+// @ts-ignore - @types/node
 const ENV = process.env;
 
 /**
  * @type {import('cfw').Config}
  */
-module.exports = {
+const shared = {
 	entry: 'index.ts',
 	profile: 'workers.demo',
+	module: true,
 	globals: {
 		DATABASE: 'KV:802e0f5c830c45d09fcae3f506579341',
 		JWT_SECRET: `SECRET:${ENV.JWT_SECRET}`,
@@ -16,3 +17,5 @@ module.exports = {
 		SENDGRID_NAME: 'ENV:DEMO CMS',
 	}
 }
+
+module.exports = shared;

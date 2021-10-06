@@ -1,6 +1,6 @@
 module.exports = {
-	name: 'contentful-api',
 	...require('../../cfw.config'),
+	name: 'contentful-api',
 	routes: [
 		'api.ley.dev/*'
 	]

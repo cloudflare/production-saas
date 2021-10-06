@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "strict": true,
+    "allowJs": true,
     "target": "esnext",
     "module": "esnext",
     "removeComments": true,
@@ -12,18 +14,16 @@
     "noImplicitAny": true,
     "alwaysStrict": true,
     "sourceMap": false,
-    "allowJs": false,
-    "strict": true,
-    "noEmit": true,
+    "checkJs": true,
     "baseUrl": ".",
     "paths": {
       "lib/*": ["lib/*"]
     }
   },
   "include": [
-    "@types/**/*",
-    "workers/**/*",
-    "lib/**/*"
+    "@types",
+    "workers",
+    "lib"
   ],
   "exclude": [
     "**/node_modules/**"
