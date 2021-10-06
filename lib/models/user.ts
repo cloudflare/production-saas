@@ -199,7 +199,7 @@ export async function tokenize(user: User) {
  * @NOTE Does not handle `JWT.verify` errors!
  * @param token The incoming JWT token
  */
-export async function identify(token: string): Promise<User|void> {
+export async function identify(token: string): Promise<User|never> {
 	const { uid, salt } = await JWT.verify(token);
 
 	// Does `user.uid` exist?
@@ -233,7 +233,5 @@ export const authenticate: Handler = async function (req, context) {
 		return send(401, (err as Error).message);
 	}
 
-	// @ts-ignore
-	// TODO(worktop) https://github.com/lukeed/worktop/issues/7
-	req.user = user;
+	context.user = user;
 }

@@ -168,9 +168,8 @@ export const load: Handler = async function (req, context) {
 		return send(400, 'Invalid Schema identifier');
 	}
 
-	const doc = await find(spaceid!, schemaid);
-	if (!doc) return send(404, 'Schema not found');
+	let item = await find(spaceid!, schemaid);
+	if (!item) return send(404, 'Schema not found');
 
-	// @ts-ignore - todo(worktop)
-	req.schema = doc;
+	context.schema = item;
 }

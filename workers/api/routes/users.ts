@@ -10,8 +10,7 @@ import * as User from 'lib/models/user';
 export const update = compose(
 	User.authenticate,
 	async function (req, context) {
-		// @ts-ignore - todo(worktop)
-		let user = req.user as User.User;
+		let user = context.user!;
 
 		if (context.params.userid !== user.uid) {
 			return send(403, 'You cannot do that');

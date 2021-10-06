@@ -36,7 +36,7 @@ export const list = compose(
 export const create = compose(
 	User.authenticate,
 	Space.load, Space.isAuthorized,
-	async function (req, res) {
+	async function (req, context) {
 		const input = await utils.body<{ slug?: string }>(req);
 		const slug = input && input.slug && input.slug.trim();
 
@@ -45,19 +45,13 @@ export const create = compose(
 			return send(400, 'TODO: port over validation lib');
 		}
 
-		// @ts-ignore - todo(worktop)
-		const { user, space, schema } = req as {
-			schema: Schema.Schema;
-			space: Space.Space;
-			user: User.User;
-		};
-
-		const exists = await Document.lookup(space.uid, slug);
+		const { user, space, schema } = context;
+		const exists = await Document.lookup(space!.uid, slug);
 		if (exists) return send(422, 'A document already exists with this slug');
 
 		// TODO: valiadate `schema.fields` okay
 
-		const doc = await Document.insert({ slug }, schema, user);
+		const doc = await Document.insert({ slug }, schema!, user!);
 		if (!doc) return send(500, 'Error creating document');
 
 		const output = Document.output(doc);
@@ -73,9 +67,8 @@ export const show = compose(
 	User.authenticate,
 	Space.load, Space.isAuthorized,
 	Document.load,
-	function (req, res) {
-		// @ts-ignore - todo(worktop)
-		const doc = req.document as Document.Doc;
+	function (req, context) {
+		const doc = context.document!;
 		return send(200, Document.output(doc));
 	}
 );
@@ -88,7 +81,7 @@ export const update = compose(
 	User.authenticate,
 	Space.load, Space.isAuthorized,
 	Document.load,
-	async function (req, res) {
+	async function (req, context) {
 		const input = await utils.body<{ slug?: string }>(req);
 		const slug = input && input.slug && input.slug.trim();
 
@@ -96,15 +89,7 @@ export const update = compose(
 			return send(400, 'TODO: port over validation lib');
 		}
 
-		// @ts-ignore - todo(worktop)
-		const { document } = req as {
-			document: Document.Doc;
-			schema: Schema.Schema;
-			space: Space.Space;
-			user: User.User;
-		};
-
-		const doc = await Document.update(document, { slug });
+		const doc = await Document.update(context.document!, { slug });
 		if (!doc) return send(500, 'Error updating document');
 		else return send(200, Document.output(doc));
 	}
@@ -119,14 +104,8 @@ export const destroy = compose(
 	Space.load, Space.isAuthorized,
 	Document.load,
 	async function (req, context) {
-		// @ts-ignore - todo(worktop)
-		const { user, document } = req as {
-			document: Document.Doc;
-			schema: Schema.Schema;
-			space: Space.Space;
-			user: User.User;
-		};
-		if (await Document.destroy(document, user)) return send(204);
+		const { user, document } = context;
+		if (await Document.destroy(document!, user!)) return send(204);
 		else return send(500, 'Error while destroying document');
 	}
 );

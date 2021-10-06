@@ -151,26 +151,21 @@ export const load: Handler = async function (req, context) {
 		return send(400, 'Invalid Space identifier');
 	}
 
-	const doc = await find(spaceid);
-	if (!doc) return send(404, 'Space not found');
+	const item = await find(spaceid);
+	if (!item) return send(404, 'Space not found');
 
-	// @ts-ignore - todo(worktop)
-	req.space = doc;
+	context.space = item;
 }
 
 /**
  * User Authorization Middleware.
- * Determine if the `req.user` is allowed to access the `req.space` document.
+ * Determine if the `User` is allowed to access the `Space` document.
  */
-export const isAuthorized: Handler = function (req, res) {
-	// @ts-ignore - todo(worktop)
-	const { user, space } = req as {
-		space: Space;
-		user: User;
-	};
+export const isAuthorized: Handler = function (req, context) {
+	const { user, space } = context;
 
 	// TODO: show 404 instead?
-	if (space.owner.uid !== user.uid) {
+	if (space!.owner.uid !== user!.uid) {
 		return send(403);
 	}
 }

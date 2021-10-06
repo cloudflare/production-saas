@@ -174,8 +174,9 @@ export function output(doc: Doc) {
  * Asserts the `suid` looks right before touching KV.
  */
 export const load: Handler = async (req, context) => {
-	const spaceid = context.params.spaceid!;
-	let alias, docid = context.params.docid!;
+	let spaceid = context.params.spaceid!;
+	let docid = context.params.docid!;
+	let alias: DocID | void;
 
 	if (isUID(docid)) {
 		// no changes
@@ -185,9 +186,8 @@ export const load: Handler = async (req, context) => {
 		return send(400, 'Invalid document identifier');
 	}
 
-	const doc = await find(spaceid, docid);
+	let doc = await find(spaceid, docid);
 	if (!doc) return send(404, 'Document not found');
 
-	// @ts-ignore - todo(worktop)
-	req.document = doc;
+	context.document = doc;
 }

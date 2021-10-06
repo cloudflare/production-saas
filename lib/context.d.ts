@@ -1,10 +1,10 @@
 import type * as worktop from 'worktop';
 import type { KV } from 'worktop/kv';
 
-import type { DocID } from 'lib/models/doc';
-import type { SchemaID } from 'lib/models/schema';
-import type { SpaceID } from 'lib/models/space';
-import type { UserID } from 'lib/models/user';
+import type { Schema, SchemaID } from 'lib/models/schema';
+import type { Space, SpaceID } from 'lib/models/space';
+import type { User, UserID } from 'lib/models/user';
+import type { Doc, DocID } from 'lib/models/doc';
 
 // Readymade `Handler` signature w/ custom types
 export type Handler = worktop.Handler<Context, Params>;
@@ -20,6 +20,12 @@ export interface Params {
 // Application Context
 export interface Context extends worktop.Context {
 	params: Params & worktop.Params;
+
+	// mutable values
+	document?: Doc;
+	schema?: Schema;
+	space?: Space;
+	user?: User;
 
 	bindings: {
 		JWT_SECRET: string;

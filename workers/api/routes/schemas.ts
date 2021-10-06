@@ -34,7 +34,7 @@ export const list = compose(
 export const create = compose(
 	User.authenticate,
 	Space.load, Space.isAuthorized,
-	async function (req, res) {
+	async function (req, context) {
 		const input = await utils.body<{ name?: string }>(req);
 		const name = input && input.name && input.name.trim();
 
@@ -42,13 +42,9 @@ export const create = compose(
 			return send(400, 'TODO: port over validation lib');
 		}
 
-		// @ts-ignore - todo(worktop)
-		const { user, space } = req as {
-			space: Space.Space;
-			user: User.User;
-		};
+		const { user, space } = context;
 
-		const doc = await Schema.insert({ name }, space, user);
+		const doc = await Schema.insert({ name }, space!, user!);
 		if (!doc) return send(500, 'Error creating document');
 
 		const output = Schema.output(doc);
@@ -64,9 +60,8 @@ export const show = compose(
 	User.authenticate,
 	Space.load, Space.isAuthorized,
 	Schema.load,
-	function (req, res) {
-		// @ts-ignore - todo(worktop)
-		const doc = req.schema as Schema.Schema;
+	function (req, context) {
+		const doc = context.schema!;
 		return send(200, Schema.output(doc));
 	}
 );
@@ -79,7 +74,7 @@ export const update = compose(
 	User.authenticate,
 	Space.load, Space.isAuthorized,
 	Schema.load,
-	async function (req, res) {
+	async function (req, context) {
 		const input = await utils.body<{ name?: string }>(req);
 		const name = input && input.name && input.name.trim();
 
@@ -87,14 +82,9 @@ export const update = compose(
 			return send(400, 'TODO: port over validation lib');
 		}
 
-		// @ts-ignore - todo(worktop)
-		const { schema } = req as {
-			schema: Schema.Schema;
-			space: Space.Space;
-			user: User.User;
-		};
+		const { schema } = context;
 
-		const doc = await Schema.update(schema, { name });
+		const doc = await Schema.update(schema!, { name });
 		if (doc) return send(200, Schema.output(doc));
 		return send(500, 'Error updating document');
 	}
@@ -108,14 +98,9 @@ export const destroy = compose(
 	User.authenticate,
 	Space.load, Space.isAuthorized,
 	Schema.load,
-	async function (req, res) {
-		// @ts-ignore - todo(worktop)
-		const { user, schema } = req as {
-			schema: Schema.Schema;
-			space: Space.Space;
-			user: User.User;
-		};
-		if (await Schema.destroy(schema, user)) return send(204);
+	async function (req, context) {
+		const { user, schema } = context;
+		if (await Schema.destroy(schema!, user!)) return send(204);
 		return send(500, 'Error while destroying Schema');
 	}
 );

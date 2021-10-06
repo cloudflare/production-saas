@@ -65,15 +65,14 @@ export const login: Handler = async req => {
  * POST /auth/refresh
  * Exchange a valid JWT for new JWT and `User` data
  */
-export const refresh: Handler = compose<Context>(
+export const refresh: Handler = compose(
 	User.authenticate,
 	async (req, context) => {
-		// @ts-ignore – TODO(worktop)
-		const user = req.user as User.User;
+		const user = context.user!;
 		const output = await User.tokenize(user);
 		return send(200, output);
 	}
-);
+) as Handler;
 
 /**
  * POST /auth/forgot
