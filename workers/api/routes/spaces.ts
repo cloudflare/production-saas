@@ -1,6 +1,8 @@
 import { compose } from 'worktop';
-import * as User from 'lib/models/user';
+import * as utils from 'worktop/utils';
+import { send } from 'worktop/response';
 import * as Space from 'lib/models/space';
+import * as User from 'lib/models/user';
 
 /**
  * GET /spaces
@@ -23,7 +25,7 @@ export const list = compose(
 			);
 		}
 
-		res.send(200, output);
+		return send(200, output);
 	}
 );
 
@@ -34,20 +36,20 @@ export const list = compose(
 export const create = compose(
 	User.authenticate,
 	async function (req, res) {
-		const input = await req.body<{ name?: string }>();
+		const input = await utils.body<{ name?: string }>(req);
 		const name = input && input.name && input.name.trim();
 
 		if (!name) {
-			return res.send(400, 'TODO: port over validation lib');
+			return send(400, 'TODO: port over validation lib');
 		}
 
 		// @ts-ignore - todo(worktop)
 		const user = req.user as User.User;
 		const doc = await Space.insert({ name }, user);
-		if (!doc) return res.send(500, 'Error creating document');
+		if (!doc) return send(500, 'Error creating document');
 
 		const output = Space.output(doc);
-		res.send(201, output);
+		return send(201, output);
 	}
 );
 
@@ -61,7 +63,7 @@ export const show = compose(
 	function (req, res) {
 		// @ts-ignore - todo(worktop)
 		const space = req.space as Space.Space;
-		res.send(200, Space.output(space));
+		return send(200, Space.output(space));
 	}
 );
 
@@ -73,19 +75,19 @@ export const update = compose(
 	User.authenticate,
 	Space.load, Space.isAuthorized,
 	async function (req, res) {
-		const input = await req.body<{ name?: string }>();
+		const input = await utils.body<{ name?: string }>(req);
 		const name = input && input.name && input.name.trim();
 
 		if (!name) {
-			return res.send(400, 'TODO: port over validation lib');
+			return send(400, 'TODO: port over validation lib');
 		}
 
 		// @ts-ignore - todo(worktop)
 		const space = req.space as Space.Space;
 		const doc = await Space.update(space, { name });
 
-		if (doc) res.send(200, Space.output(doc));
-		else res.send(500, 'Error updating document');
+		if (doc) return send(200, Space.output(doc));
+		return send(500, 'Error updating document');
 	}
 );
 
@@ -102,7 +104,7 @@ export const destroy = compose(
 			space: Space.Space;
 			user: User.User;
 		};
-		if (await Space.destroy(space, user)) res.send(204);
-		else res.send(500, 'Error while destroying Space');
+		if (await Space.destroy(space, user)) return send(204);
+		return send(500, 'Error while destroying Space');
 	}
 );

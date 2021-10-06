@@ -1,4 +1,6 @@
 import { compose } from 'worktop';
+import * as utils from 'worktop/utils';
+import { send } from 'worktop/response';
 import * as paging from 'lib/utils/paging';
 import * as Schema from 'lib/models/schema';
 import * as Document from 'lib/models/doc';
@@ -17,13 +19,13 @@ import * as User from 'lib/models/user';
 export const list = compose(
 	User.authenticate,
 	Space.load, Space.isAuthorized,
-	async function (req, res) {
-		const { limit, page } = paging.parse(req.query);
-		const spaceid = req.params.spaceid as Space.SpaceID;
+	async function (req, context) {
+		const spaceid = context.params.spaceid as Space.SpaceID;
+		const { limit, page } = paging.parse(context.url.searchParams);
 		const items = await Document.list(spaceid, { limit, page });
 
 		const output = items.map(Document.output);
-		res.send(200, output);
+		return send(200, output);
 	}
 );
 
@@ -35,12 +37,12 @@ export const create = compose(
 	User.authenticate,
 	Space.load, Space.isAuthorized,
 	async function (req, res) {
-		const input = await req.body<{ slug?: string }>();
+		const input = await utils.body<{ slug?: string }>(req);
 		const slug = input && input.slug && input.slug.trim();
 
 		if (!slug) {
 			// TODO: maybe default `slug` to `uid` if blank?
-			return res.send(400, 'TODO: port over validation lib');
+			return send(400, 'TODO: port over validation lib');
 		}
 
 		// @ts-ignore - todo(worktop)
@@ -51,15 +53,15 @@ export const create = compose(
 		};
 
 		const exists = await Document.lookup(space.uid, slug);
-		if (exists) return res.send(422, 'A document already exists with this slug');
+		if (exists) return send(422, 'A document already exists with this slug');
 
 		// TODO: valiadate `schema.fields` okay
 
 		const doc = await Document.insert({ slug }, schema, user);
-		if (!doc) return res.send(500, 'Error creating document');
+		if (!doc) return send(500, 'Error creating document');
 
 		const output = Document.output(doc);
-		res.send(201, output);
+		return send(201, output);
 	}
 );
 
@@ -74,7 +76,7 @@ export const show = compose(
 	function (req, res) {
 		// @ts-ignore - todo(worktop)
 		const doc = req.document as Document.Doc;
-		res.send(200, Document.output(doc));
+		return send(200, Document.output(doc));
 	}
 );
 
@@ -87,11 +89,11 @@ export const update = compose(
 	Space.load, Space.isAuthorized,
 	Document.load,
 	async function (req, res) {
-		const input = await req.body<{ slug?: string }>();
+		const input = await utils.body<{ slug?: string }>(req);
 		const slug = input && input.slug && input.slug.trim();
 
 		if (!slug) {
-			return res.send(400, 'TODO: port over validation lib');
+			return send(400, 'TODO: port over validation lib');
 		}
 
 		// @ts-ignore - todo(worktop)
@@ -103,8 +105,8 @@ export const update = compose(
 		};
 
 		const doc = await Document.update(document, { slug });
-		if (!doc) res.send(500, 'Error updating document');
-		else res.send(200, Document.output(doc));
+		if (!doc) return send(500, 'Error updating document');
+		else return send(200, Document.output(doc));
 	}
 );
 
@@ -116,7 +118,7 @@ export const destroy = compose(
 	User.authenticate,
 	Space.load, Space.isAuthorized,
 	Document.load,
-	async function (req, res) {
+	async function (req, context) {
 		// @ts-ignore - todo(worktop)
 		const { user, document } = req as {
 			document: Document.Doc;
@@ -124,7 +126,7 @@ export const destroy = compose(
 			space: Space.Space;
 			user: User.User;
 		};
-		if (await Document.destroy(document, user)) res.send(204);
-		else res.send(500, 'Error while destroying document');
+		if (await Document.destroy(document, user)) return send(204);
+		else return send(500, 'Error while destroying document');
 	}
 );

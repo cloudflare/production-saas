@@ -3,14 +3,15 @@ import * as keys from 'lib/utils/keys';
 import * as Password from 'lib/models/password';
 import * as database from 'lib/utils/database';
 import * as emails from 'lib/sendgrid/users';
+import { send } from 'worktop/response';
 import * as Email from './email';
 
 import * as Prices from 'lib/stripe/prices';
 import * as Customers from 'lib/stripe/customers';
 import * as Subscriptions from 'lib/stripe/subscriptions';
 
-import type { Handler } from 'worktop';
 import type { UID } from 'worktop/utils';
+import type { Handler } from 'lib/context';
 import type { SALT, PASSWORD } from 'lib/models/password';
 import type { Subscription } from 'lib/stripe/subscriptions';
 import type { Customer } from 'lib/stripe/customers';
@@ -217,19 +218,19 @@ export async function identify(token: string): Promise<User|void> {
  * Identifies a User via incoming `Authorization` header.
  * @TODO Potentially add `Cookie` identity-parsing fallback.
  */
-export const authenticate: Handler = async function (req, res) {
+export const authenticate: Handler = async function (req, context) {
 	// TODO? Generic error messages instead?
 	const auth = req.headers.get('authorization');
-	if (!auth) return res.send(401, 'Missing Authorization header');
+	if (!auth) return send(401, 'Missing Authorization header');
 
 	const [schema, token] = auth.split(' ');
-	if (schema !== 'Bearer') return res.send(401, 'Invalid Authorization format');
-	if (!token) return res.send(401, 'Missing Authorization token');
+	if (schema !== 'Bearer') return send(401, 'Invalid Authorization format');
+	if (!token) return send(401, 'Missing Authorization token');
 
 	try {
 		var user = await identify(token);
 	} catch (err) {
-		return res.send(401, err.message);
+		return send(401, (err as Error).message);
 	}
 
 	// @ts-ignore

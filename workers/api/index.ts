@@ -10,7 +10,10 @@ import * as Schemas from './routes/schemas';
 import * as Documents from './routes/docs';
 import * as Spaces from './routes/spaces';
 
-const API = new Router;
+// Context / App Environment
+import type { Context } from 'lib/context';
+
+const API = new Router<Context>();
 
 API.prepare = CORS.preflight({
 	origin: '*', // TODO?
@@ -44,4 +47,5 @@ API.add('DELETE', '/spaces/:spaceid/schemas/:schemaid', Schemas.destroy);
 
 API.add('PUT', '/users/:userid', Users.update);
 
-Cache.listen(API.run);
+// init: Module Worker
+export default Cache.reply(API.run);

@@ -1,9 +1,11 @@
 import { compose } from 'worktop';
+import * as utils from 'worktop/utils';
+import { send } from 'worktop/response';
 import * as Email from 'lib/models/email';
 import * as Password from 'lib/models/password';
 import * as User from 'lib/models/user';
 
-import type { Handler } from 'worktop';
+import type { Handler, Context } from 'lib/context';
 import type { Credentials } from 'lib/models/user';
 import type { TOKEN } from 'lib/models/password';
 
@@ -12,33 +14,33 @@ import type { TOKEN } from 'lib/models/password';
 /**
  * POST /auth/register
  */
-export const register: Handler = async (req, res) => {
-	const input = await req.body<Credentials>();
+export const register: Handler = async req => {
+	const input = await utils.body<Credentials>(req);
 
 	if (!input || !input.email || !input.password) {
-		return res.send(400, 'TODO: port over validation lib');
+		return send(400, 'TODO: port over validation lib');
 	}
 
 	// Check for existing user email
 	const { email, password } = input;
 	const userid = await Email.find(email);
-	if (userid) return res.send(400, 'An account already exists for this address');
+	if (userid) return send(400, 'An account already exists for this address');
 
 	const user = await User.insert({ email, password });
-	if (!user) return res.send(500, 'Error creating account');
+	if (!user) return send(500, 'Error creating account');
 
 	const output = await User.tokenize(user);
-	res.send(201, output);
+	return send(201, output);
 }
 
 /**
  * POST /auth/login
  */
-export const login: Handler = async (req, res) => {
-	const input = await req.body<Credentials>();
+export const login: Handler = async req => {
+	const input = await utils.body<Credentials>(req);
 
 	if (!input || !input.email || !input.password) {
-		return res.send(400, 'TODO: port over validation lib');
+		return send(400, 'TODO: port over validation lib');
 	}
 
 	// the amibiguous error message to send
@@ -47,29 +49,29 @@ export const login: Handler = async (req, res) => {
 	// Check for existing user email
 	const { email, password } = input;
 	const userid = await Email.find(email);
-	if (!userid) return res.send(401, ambiguous);
+	if (!userid) return send(401, ambiguous);
 
 	const user = await User.find(userid);
-	if (!user) return res.send(401, ambiguous);
+	if (!user) return send(401, ambiguous);
 
 	const isMatch = await Password.compare(user, password);
-	if (!isMatch) return res.send(401, ambiguous);
+	if (!isMatch) return send(401, ambiguous);
 
 	const output = await User.tokenize(user);
-	res.send(200, output);
+	return send(200, output);
 }
 
 /**
  * POST /auth/refresh
  * Exchange a valid JWT for new JWT and `User` data
  */
-export const refresh: Handler = compose(
+export const refresh: Handler = compose<Context>(
 	User.authenticate,
-	async (req, res) => {
+	async (req, context) => {
 		// @ts-ignore – TODO(worktop)
 		const user = req.user as User.User;
 		const output = await User.tokenize(user);
-		res.send(200, output);
+		return send(200, output);
 	}
 );
 
@@ -77,12 +79,12 @@ export const refresh: Handler = compose(
  * POST /auth/forgot
  * Initialize the Password Reset process
  */
-export const forgot: Handler = async (req, res) => {
+export const forgot: Handler = async req => {
 	type Input = { email?: string };
-	const input = await req.body<Input>();
+	const input = await utils.body<Input>(req);
 
 	if (!input || !input.email) {
-		return res.send(400, 'TODO: port over validation lib');
+		return send(400, 'TODO: port over validation lib');
 	}
 
 	// the amibiguous message to send
@@ -90,24 +92,24 @@ export const forgot: Handler = async (req, res) => {
 
 	// Check for existing user email
 	const userid = await Email.find(input.email);
-	if (!userid) return res.send(200, ambiguous);
+	if (!userid) return send(200, ambiguous);
 
 	const user = await User.find(userid);
-	if (!user) return res.send(200, ambiguous);
+	if (!user) return send(200, ambiguous);
 
-	if (await Password.forgot(user)) res.send(200, ambiguous);
-	else res.send(400, 'Error while resetting password');
+	if (await Password.forgot(user)) return send(200, ambiguous);
+	else return send(400, 'Error while resetting password');
 }
 
 /**
  * POST /auth/reset
  */
-export const reset: Handler = async (req, res) => {
+export const reset: Handler = async req => {
 	type Input = Credentials & { token?: TOKEN };
-	const input = await req.body<Input>();
+	const input = await utils.body<Input>(req);
 
 	if (!input || !input.email || !input.password || !input.token) {
-		return res.send(400, 'TODO: port over validation lib');
+		return send(400, 'TODO: port over validation lib');
 	}
 
 	// the amibiguous message to send
@@ -115,22 +117,22 @@ export const reset: Handler = async (req, res) => {
 	const { token, email, password } = input;
 
 	const isValid = Password.isUID(token);
-	if (!isValid) return res.send(400, ambiguous);
+	if (!isValid) return send(400, ambiguous);
 
 	const userid = await Password.find(token);
-	if (!userid) return res.send(400, ambiguous);
+	if (!userid) return send(400, ambiguous);
 
 	let user = await User.find(userid);
-	if (!user) return res.send(400, ambiguous);
+	if (!user) return send(400, ambiguous);
 
 	if (user.email !== email) {
-		return res.send(400, ambiguous);
+		return send(400, ambiguous);
 	}
 
 	// regenerate salt
 	user = await User.update(user, { password });
-	if (!user) return res.send(500, 'Error updating user document');
+	if (!user) return send(500, 'Error updating user document');
 
 	const output = await User.tokenize(user);
-	res.send(200, output);
+	return send(200, output);
 }

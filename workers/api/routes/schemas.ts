@@ -1,4 +1,6 @@
 import { compose } from 'worktop';
+import * as utils from 'worktop/utils';
+import { send } from 'worktop/response';
 import * as paging from 'lib/utils/paging';
 import * as Schema from 'lib/models/schema';
 import * as Space from 'lib/models/space';
@@ -15,13 +17,13 @@ import * as User from 'lib/models/user';
 export const list = compose(
 	User.authenticate,
 	Space.load, Space.isAuthorized,
-	async function (req, res) {
-		const { limit, page } = paging.parse(req.query);
-		const spaceid = req.params.spaceid as Space.SpaceID;
+	async function (req, context) {
+		const { limit, page } = paging.parse(context.url.searchParams);
+		const spaceid = context.params.spaceid as Space.SpaceID; // todo
 		const items = await Schema.list(spaceid, { limit, page });
 
 		const output = items.map(Schema.output);
-		res.send(200, output);
+		return send(200, output);
 	}
 );
 
@@ -33,11 +35,11 @@ export const create = compose(
 	User.authenticate,
 	Space.load, Space.isAuthorized,
 	async function (req, res) {
-		const input = await req.body<{ name?: string }>();
+		const input = await utils.body<{ name?: string }>(req);
 		const name = input && input.name && input.name.trim();
 
 		if (!name) {
-			return res.send(400, 'TODO: port over validation lib');
+			return send(400, 'TODO: port over validation lib');
 		}
 
 		// @ts-ignore - todo(worktop)
@@ -47,10 +49,10 @@ export const create = compose(
 		};
 
 		const doc = await Schema.insert({ name }, space, user);
-		if (!doc) return res.send(500, 'Error creating document');
+		if (!doc) return send(500, 'Error creating document');
 
 		const output = Schema.output(doc);
-		res.send(201, output);
+		return send(201, output);
 	}
 );
 
@@ -65,7 +67,7 @@ export const show = compose(
 	function (req, res) {
 		// @ts-ignore - todo(worktop)
 		const doc = req.schema as Schema.Schema;
-		res.send(200, Schema.output(doc));
+		return send(200, Schema.output(doc));
 	}
 );
 
@@ -78,11 +80,11 @@ export const update = compose(
 	Space.load, Space.isAuthorized,
 	Schema.load,
 	async function (req, res) {
-		const input = await req.body<{ name?: string }>();
+		const input = await utils.body<{ name?: string }>(req);
 		const name = input && input.name && input.name.trim();
 
 		if (!name) {
-			return res.send(400, 'TODO: port over validation lib');
+			return send(400, 'TODO: port over validation lib');
 		}
 
 		// @ts-ignore - todo(worktop)
@@ -93,8 +95,8 @@ export const update = compose(
 		};
 
 		const doc = await Schema.update(schema, { name });
-		if (!doc) res.send(500, 'Error updating document');
-		else res.send(200, Schema.output(doc));
+		if (doc) return send(200, Schema.output(doc));
+		return send(500, 'Error updating document');
 	}
 );
 
@@ -113,7 +115,7 @@ export const destroy = compose(
 			space: Space.Space;
 			user: User.User;
 		};
-		if (await Schema.destroy(schema, user)) res.send(204);
-		else res.send(500, 'Error while destroying Schema');
+		if (await Schema.destroy(schema, user)) return send(204);
+		return send(500, 'Error while destroying Schema');
 	}
 );

@@ -1,9 +1,10 @@
 import * as keys from 'lib/utils/keys';
+import { send } from 'worktop/response';
 import * as database from 'lib/utils/database';
 import * as Customers from 'lib/stripe/customers';
 import * as Owner from './owner';
 
-import type { Handler } from 'worktop';
+import type { Handler } from 'lib/context';
 import type { UID } from 'worktop/utils';
 import type { User } from './user';
 
@@ -143,13 +144,15 @@ export function output(doc: Space) {
  * Middleware to load a `Space` document.
  * Asserts the `suid` looks right before touching KV.
  */
-export const load: Handler<{ spaceid: SpaceID | string }> = async function (req, res) {
-	if (!isUID(req.params.spaceid)) {
-		return res.send(400, 'Invalid Space identifier');
+export const load: Handler = async function (req, context) {
+	const { spaceid } = context.params;
+
+	if (!isUID(spaceid!)) {
+		return send(400, 'Invalid Space identifier');
 	}
 
-	const doc = await find(req.params.spaceid);
-	if (!doc) return res.send(404, 'Space not found');
+	const doc = await find(spaceid);
+	if (!doc) return send(404, 'Space not found');
 
 	// @ts-ignore - todo(worktop)
 	req.space = doc;
@@ -168,6 +171,6 @@ export const isAuthorized: Handler = function (req, res) {
 
 	// TODO: show 404 instead?
 	if (space.owner.uid !== user.uid) {
-		return res.send(403);
+		return send(403);
 	}
 }

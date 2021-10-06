@@ -1,9 +1,10 @@
 import * as keys from 'lib/utils/keys';
+import { send } from 'worktop/response';
 import * as database from 'lib/utils/database';
 import * as Customers from 'lib/stripe/customers';
 import * as Owner from './owner';
 
-import type { Handler } from 'worktop';
+import type { Handler } from 'lib/context';
 import type { ULID } from 'worktop/utils';
 import type { Options } from 'worktop/kv';
 import type { Schema, SchemaID } from './schema';
@@ -172,20 +173,20 @@ export function output(doc: Doc) {
  * Middleware to load a `Doc` document.
  * Asserts the `suid` looks right before touching KV.
  */
-export const load: Handler<{ spaceid: SpaceID|string, docid: DocID|string }> = async function (req, res) {
-	const spaceid = req.params.spaceid as SpaceID;
-	let alias, docid = req.params.docid as DocID;
+export const load: Handler = async (req, context) => {
+	const spaceid = context.params.spaceid!;
+	let alias, docid = context.params.docid!;
 
 	if (isUID(docid)) {
 		// no changes
 	} else if (alias = await lookup(spaceid, docid)) {
 		docid = alias; // was a valid slug
 	} else {
-		return res.send(400, 'Invalid document identifier');
+		return send(400, 'Invalid document identifier');
 	}
 
-	const doc = await find(spaceid as SpaceID, docid);
-	if (!doc) return res.send(404, 'Document not found');
+	const doc = await find(spaceid, docid);
+	if (!doc) return send(404, 'Document not found');
 
 	// @ts-ignore - todo(worktop)
 	req.document = doc;

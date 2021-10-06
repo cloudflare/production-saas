@@ -1,4 +1,6 @@
 import { compose } from 'worktop';
+import * as utils from 'worktop/utils';
+import { send } from 'worktop/response';
 import * as User from 'lib/models/user';
 
 /**
@@ -7,26 +9,26 @@ import * as User from 'lib/models/user';
  */
 export const update = compose(
 	User.authenticate,
-	async function (req, res) {
+	async function (req, context) {
 		// @ts-ignore - todo(worktop)
 		let user = req.user as User.User;
 
-		if (req.params.userid !== user.uid) {
-			return res.send(403, 'You cannot do that');
+		if (context.params.userid !== user.uid) {
+			return send(403, 'You cannot do that');
 		}
 
 		type Input = Partial<User.User>;
-		const input = await req.body<Input>();
+		const input = await utils.body<Input>(req);
 
 		// TODO: input validations
 		// Only continue if we have new values
 		if (input && Object.keys(input).length > 0) {
 			const doc = await User.update(user, input);
-			if (!doc) return res.send(500, 'Error updating user document');
+			if (!doc) return send(500, 'Error updating user document');
 			user = doc;
 		}
 
 		const output = await User.tokenize(user);
-		res.send(200, output);
+		return send(200, output);
 	}
 );

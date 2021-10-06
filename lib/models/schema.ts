@@ -1,9 +1,10 @@
 import * as keys from 'lib/utils/keys';
+import { send } from 'worktop/response';
 import * as database from 'lib/utils/database';
 import * as Customers from 'lib/stripe/customers';
 import * as Owner from './owner';
 
-import type { Handler } from 'worktop';
+import type { Handler } from 'lib/context';
 import type { ULID } from 'worktop/utils';
 import type { Options } from 'worktop/kv';
 import type { Space, SpaceID } from './space';
@@ -160,15 +161,15 @@ export function output(doc: Schema) {
  * Middleware to load a `Schema` document.
  * Asserts the `suid` looks right before touching KV.
  */
-export const load: Handler<{ spaceid: SpaceID|string, schemaid: SchemaID|string }> = async function (req, res) {
-	const { spaceid, schemaid } = req.params;
+export const load: Handler = async function (req, context) {
+	const { spaceid, schemaid } = context.params;
 
-	if (!isUID(schemaid)) {
-		return res.send(400, 'Invalid Schema identifier');
+	if (!isUID(schemaid!)) {
+		return send(400, 'Invalid Schema identifier');
 	}
 
-	const doc = await find(spaceid as SpaceID, schemaid);
-	if (!doc) return res.send(404, 'Schema not found');
+	const doc = await find(spaceid!, schemaid);
+	if (!doc) return send(404, 'Schema not found');
 
 	// @ts-ignore - todo(worktop)
 	req.schema = doc;

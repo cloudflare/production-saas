@@ -1,4 +1,4 @@
-import { toHEX } from 'worktop/utils';
+import { toHEX } from 'worktop/buffer';
 import { PBKDF2 } from 'worktop/crypto';
 import * as database from 'lib/utils/database';
 import * as keys from 'lib/utils/keys';
