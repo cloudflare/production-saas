@@ -15,13 +15,13 @@ env:
 
 jobs:
   test:
-    name: Node.js v14
+    name: Node.js v16
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v2
       with:
-        node-version: 14
+        node-version: 16
 
     - name: (env) pnpm
       run: curl -L https://pnpm.js.org/pnpm.js | node - add --global pnpm
@@ -45,7 +45,10 @@ jobs:
     - name: Compiles
       run: pnpm run build
 
-    # temporary
+    - name: DEBUG
+      run: cat build/index.js
+
+    # todo: temporary - needs "worker" dir check
     - name: Deploy
       if: ${{ github.ref == 'refs/heads/main' }}
       run: pnpm run deploy
