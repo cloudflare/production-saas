@@ -1,5 +1,6 @@
 // Dependencies
 import { Router } from 'worktop';
+import { convert } from 'worktop/sw';
 import * as Cache from 'worktop/cache';
 import * as CORS from 'worktop/cors';
 
@@ -47,5 +48,8 @@ API.add('DELETE', '/spaces/:spaceid/schemas/:schemaid', Schemas.destroy);
 
 API.add('PUT', '/users/:userid', Users.update);
 
-// init: Module Worker
-export default Cache.reply(API.run);
+// ESM format -> EventListener
+const handler = convert(API.run);
+
+// init: Service Worker
+Cache.listen(handler);
