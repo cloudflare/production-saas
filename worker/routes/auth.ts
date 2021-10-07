@@ -5,7 +5,7 @@ import * as Email from 'lib/models/email';
 import * as Password from 'lib/models/password';
 import * as User from 'lib/models/user';
 
-import type { Handler, Context } from 'lib/context';
+import type { Handler } from 'lib/context';
 import type { Credentials } from 'lib/models/user';
 import type { TOKEN } from 'lib/models/password';
 

@@ -15,17 +15,15 @@
     "alwaysStrict": true,
     "sourceMap": false,
     "checkJs": true,
-    "baseUrl": ".",
+    "noEmit": true,
     "paths": {
-      "lib/*": ["lib/*"]
+      "lib/*": ["./worker/lib/*"]
     }
   },
   "include": [
-    "@types",
-    "worker",
-    "lib"
+    "worker/**/*"
   ],
   "exclude": [
-    "**/node_modules/**"
+    "node_modules"
   ]
 }
