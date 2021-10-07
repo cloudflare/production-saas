@@ -1,8 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "build": "cfw build worker -s --no-minify",
-    "deploy": "cfw deploy worker -s",
+    "build": "cfw build worker -s",
+    "deploy": "cfw deploy",
     "types": "tsc --noEmit"
   },
   "devDependencies": {

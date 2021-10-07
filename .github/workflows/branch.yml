@@ -31,7 +31,7 @@ jobs:
       with:
         path: ~/.pnpm-store
         key: ${{ runner.os }}-node14-${{ hashFiles('**/package.json') }}
-        restore-keys: ${{ runner.os }}-node14-
+        restore-keys: ${{ runner.os }}-node16-
 
     - name: Install
       run: pnpm install
@@ -44,9 +44,6 @@ jobs:
 
     - name: Compiles
       run: pnpm run build
-
-    - name: DEBUG
-      run: cat build/index.js
 
     # todo: temporary - needs "worker" dir check
     - name: Deploy
