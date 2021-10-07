@@ -4,9 +4,13 @@ const ENV = process.env;
 /**
  * @type {import('cfw').Config}
  */
-const shared = {
+const config = {
 	entry: 'index.ts',
 	profile: 'workers.demo',
+	name: 'contentful-api',
+	routes: [
+		'api.ley.dev/*'
+	],
 	globals: {
 		DATABASE: 'KV:802e0f5c830c45d09fcae3f506579341',
 		JWT_SECRET: `SECRET:${ENV.JWT_SECRET}`,
@@ -17,4 +21,4 @@ const shared = {
 	}
 }
 
-module.exports = shared;
+module.exports = config;
