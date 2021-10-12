@@ -1,6 +1,15 @@
 {
   "private": true,
+  "scripts": {
+    "build": "cfw build . -s",
+    "deploy": "cfw deploy build -s",
+    "dev": "miniflare --watch"
+  },
   "dependencies": {
     "worktop": "0.8.0-next.5"
+  },
+  "devDependencies": {
+    "cfw": "0.3.0",
+    "miniflare": "1.4.1"
   }
 }

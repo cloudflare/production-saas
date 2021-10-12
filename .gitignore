@@ -4,7 +4,10 @@ node_modules
 *.lock
 *.log
 
-/build
+.env
+.env.prod
+
+/worker/build
 /client/public
 
 /ignore

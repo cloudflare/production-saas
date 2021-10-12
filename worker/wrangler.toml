@@ -1,0 +1,21 @@
+type = "javascript"
+name = "cms-headless"
+workers_dev = true
+# Add your account ID here
+account_id = ""
+
+[build]
+command = "npm run build"
+watch_dir = "worker"
+
+[build.upload]
+main = "./index.js"
+dir = "./build"
+
+[miniflare]
+kv_persist = "./build/kv/"
+
+[[kv_namespaces]]
+binding = "DATABASE"
+preview_id = "<ignored>"
+id = "<ignored>"

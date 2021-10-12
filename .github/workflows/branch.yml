@@ -42,8 +42,8 @@ jobs:
     - name: Check Types
       run: pnpm run types
 
-    - name: Compiles
-      run: pnpm run build
+    - name: (worker) Compiles
+      run: pnpm run worker build
 
     # todo: temporary - needs "client" dir check
     # todo(pages) - need open-ended "preview" deploy hook (see #9)
@@ -56,4 +56,4 @@ jobs:
     # todo: temporary - needs "worker" dir check
     - name: (worker) Deploy
       if: ${{ github.ref == 'refs/heads/main' }}
-      run: pnpm run deploy
+      run: pnpm run worker deploy
