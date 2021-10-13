@@ -17,7 +17,7 @@
     "checkJs": true,
     "noEmit": true,
     "paths": {
-      "lib/*": ["./worker/lib/*"]
+      "lib/*": ["./worker/src/lib/*"]
     }
   },
   "include": [

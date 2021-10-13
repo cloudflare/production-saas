@@ -12,7 +12,7 @@ import * as Documents from './routes/docs';
 import * as Spaces from './routes/spaces';
 
 // Context / App Environment
-import type { Context } from 'lib/context';
+import type { Context } from './lib/context';
 
 const API = new Router<Context>();
 

@@ -2,7 +2,6 @@ import { compose } from 'worktop';
 import * as utils from 'worktop/utils';
 import { send } from 'worktop/response';
 import * as paging from 'lib/utils/paging';
-import * as Schema from 'lib/models/schema';
 import * as Document from 'lib/models/doc';
 import * as Space from 'lib/models/space';
 import * as User from 'lib/models/user';
