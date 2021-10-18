@@ -14,3 +14,5 @@ export const send: typeof res.send = function (code, data, headers) {
 	}
 	return res.send(code, data, headers);
 }
+
+export const seconds = (): TIMESTAMP => Date.now() / 1e3 | 0;

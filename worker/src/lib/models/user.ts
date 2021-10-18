@@ -104,9 +104,9 @@ export async function insert(values: Credentials): Promise<User|void> {
 
 	const user: User = {
 		uid: nxtUID,
-		created_at: Date.now(),
-		last_updated: null,
 		email: values.email,
+		created_at: utils.seconds(),
+		last_updated: null,
 		stripe: {
 			customer: subscription.customer,
 			subscription: subscription.id,
@@ -152,7 +152,7 @@ export async function update(user: User, changes: UserChanges): Promise<User|voi
 	user.firstname = changes.firstname || user.firstname;
 	user.lastname = changes.lastname || user.lastname;
 	user.email = changes.email || user.email;
-	user.last_updated = Date.now();
+	user.last_updated = utils.seconds();
 
 	if (hasPassword) {
 		const sanitized = await Password.prepare(changes.password!);

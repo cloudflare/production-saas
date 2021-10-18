@@ -99,7 +99,7 @@ export async function insert(values: { name: string }, space: Space, user: User)
 		uid: await utils.until(toUID, toFind),
 		name: values.name.trim(),
 		spaceid: space.uid,
-		created_at: Date.now(),
+		created_at: utils.seconds(),
 		last_updated: null,
 		fields: [], // TODO
 		owner: {
@@ -127,7 +127,7 @@ export async function update(schema: Schema, changes: { name?: string }): Promis
 
 	// Explicitly choose properties to update
 	// ~> AKA, do not allow `uid` or `created_at` updates
-	schema.last_updated = Date.now();
+	schema.last_updated = utils.seconds();
 	schema.name = changes.name;
 
 	if (!await save(schema)) return false;

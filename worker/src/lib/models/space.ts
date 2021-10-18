@@ -71,7 +71,7 @@ export async function insert(values: { name: string }, user: User): Promise<Spac
 		// Create new `SpaceID`s until available
 		uid: await utils.until(toUID, find),
 		name: values.name.trim(),
-		created_at: Date.now(),
+		created_at: utils.seconds(),
 		last_updated: null,
 		owner: {
 			type: 'user',
@@ -101,7 +101,7 @@ export async function update(space: Space, changes: { name?: string }): Promise<
 
 	// Explicitly choose properties to update
 	// ~> AKA, do not allow `uid` or `created_at` updates
-	space.last_updated = Date.now();
+	space.last_updated = utils.seconds();
 	space.name = changes.name;
 
 	if (!await save(space)) return false;

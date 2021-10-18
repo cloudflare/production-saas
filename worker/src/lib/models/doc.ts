@@ -110,7 +110,7 @@ export async function insert(values: Pick<Doc, 'slug'>, schema: Schema, user: Us
 		},
 		schemaid: schema.uid,
 		spaceid: schema.spaceid,
-		created_at: Date.now(),
+		created_at: utils.seconds(),
 		last_updated: null,
 		owner: {
 			type: 'user',
@@ -137,7 +137,7 @@ export async function update(schema: Doc, changes: Partial<Input<Doc>>): Promise
 
 	// Explicitly choose properties to update
 	// ~> AKA, do not allow `uid` or `created_at` updates
-	schema.last_updated = Date.now();
+	schema.last_updated = utils.seconds();
 	schema.slug = changes.slug;
 
 	// TODO: remove old slug alias if changed

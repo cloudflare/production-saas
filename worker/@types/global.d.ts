@@ -2,7 +2,7 @@ declare type TODO = any;
 declare type Nullable<T> = T | null;
 declare type Dict<T> = Record<string, T>;
 
-// AKA: Date.now() format
+/** @NOTE seconds */
 declare type TIMESTAMP = number;
 
 // Do not need these properties on any input
