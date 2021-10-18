@@ -1,5 +1,4 @@
 import * as utils from 'lib/utils';
-import { send } from 'worktop/response';
 import * as database from 'lib/utils/database';
 import * as Customers from 'lib/stripe/customers';
 import * as Owner from './owner';
@@ -148,11 +147,11 @@ export const load: Handler = async function (req, context) {
 	const { spaceid } = context.params;
 
 	if (!isUID(spaceid!)) {
-		return send(400, 'Invalid Space identifier');
+		return utils.send(400, 'Invalid Space identifier');
 	}
 
 	const item = await find(spaceid);
-	if (!item) return send(404, 'Space not found');
+	if (!item) return utils.send(404, 'Space not found');
 
 	context.space = item;
 }
@@ -166,6 +165,6 @@ export const isAuthorized: Handler = function (req, context) {
 
 	// TODO: show 404 instead?
 	if (space!.owner.uid !== user!.uid) {
-		return send(403);
+		return utils.send(403);
 	}
 }

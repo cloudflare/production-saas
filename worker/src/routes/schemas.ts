@@ -1,10 +1,9 @@
 import { compose } from 'worktop';
-import * as utils from 'worktop/utils';
-import { send } from 'worktop/response';
 import * as paging from 'lib/utils/paging';
 import * as Schema from 'lib/models/schema';
 import * as Space from 'lib/models/space';
 import * as User from 'lib/models/user';
+import * as utils from 'lib/utils';
 
 // TODO:
 //  - request validation
@@ -23,7 +22,7 @@ export const list = compose(
 		const items = await Schema.list(spaceid, { limit, page });
 
 		const output = items.map(Schema.output);
-		return send(200, output);
+		return utils.send(200, output);
 	}
 );
 
@@ -39,16 +38,16 @@ export const create = compose(
 		const name = input && input.name && input.name.trim();
 
 		if (!name) {
-			return send(400, 'TODO: port over validation lib');
+			return utils.send(400, 'TODO: port over validation lib');
 		}
 
 		const { user, space } = context;
 
 		const doc = await Schema.insert({ name }, space!, user!);
-		if (!doc) return send(500, 'Error creating document');
+		if (!doc) return utils.send(500, 'Error creating document');
 
 		const output = Schema.output(doc);
-		return send(201, output);
+		return utils.send(201, output);
 	}
 );
 
@@ -62,7 +61,7 @@ export const show = compose(
 	Schema.load,
 	function (req, context) {
 		const doc = context.schema!;
-		return send(200, Schema.output(doc));
+		return utils.send(200, Schema.output(doc));
 	}
 );
 
@@ -79,14 +78,14 @@ export const update = compose(
 		const name = input && input.name && input.name.trim();
 
 		if (!name) {
-			return send(400, 'TODO: port over validation lib');
+			return utils.send(400, 'TODO: port over validation lib');
 		}
 
 		const { schema } = context;
 
 		const doc = await Schema.update(schema!, { name });
-		if (doc) return send(200, Schema.output(doc));
-		return send(500, 'Error updating document');
+		if (doc) return utils.send(200, Schema.output(doc));
+		return utils.send(500, 'Error updating document');
 	}
 );
 
@@ -100,7 +99,7 @@ export const destroy = compose(
 	Schema.load,
 	async function (req, context) {
 		const { user, schema } = context;
-		if (await Schema.destroy(schema!, user!)) return send(204);
-		return send(500, 'Error while destroying Schema');
+		if (await Schema.destroy(schema!, user!)) return utils.send(204);
+		return utils.send(500, 'Error while destroying Schema');
 	}
 );

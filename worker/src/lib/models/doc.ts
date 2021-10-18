@@ -1,5 +1,4 @@
 import * as utils from 'lib/utils';
-import { send } from 'worktop/response';
 import * as database from 'lib/utils/database';
 import * as Customers from 'lib/stripe/customers';
 import * as Owner from './owner';
@@ -183,11 +182,11 @@ export const load: Handler = async (req, context) => {
 	} else if (alias = await lookup(spaceid, docid)) {
 		docid = alias; // was a valid slug
 	} else {
-		return send(400, 'Invalid document identifier');
+		return utils.send(400, 'Invalid document identifier');
 	}
 
 	let doc = await find(spaceid, docid);
-	if (!doc) return send(404, 'Document not found');
+	if (!doc) return utils.send(404, 'Document not found');
 
 	context.document = doc;
 }

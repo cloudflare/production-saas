@@ -2,7 +2,6 @@ import { HS256 } from 'worktop/jwt';
 import * as Password from 'lib/models/password';
 import * as database from 'lib/utils/database';
 import * as emails from 'lib/sendgrid/users';
-import { send } from 'worktop/response';
 import * as utils from 'lib/utils';
 import * as Email from './email';
 
@@ -10,7 +9,7 @@ import * as Prices from 'lib/stripe/prices';
 import * as Customers from 'lib/stripe/customers';
 import * as Subscriptions from 'lib/stripe/subscriptions';
 
-import type { UID } from 'worktop/utils';
+import type { UID } from 'lib/utils';
 import type { Handler } from 'lib/context';
 import type { SALT, PASSWORD } from 'lib/models/password';
 import type { Subscription } from 'lib/stripe/subscriptions';
@@ -212,17 +211,17 @@ export async function tokenize(user: User) {
  */
 export const authenticate: Handler = async function (req, context) {
 	let auth = req.headers.get('authorization');
-	if (!auth) return send(401, 'Missing Authorization header');
+	if (!auth) return utils.send(401, 'Missing Authorization header');
 
 	let [schema, token] = auth.split(/\s+/);
 	if (!token || schema.toLowerCase() !== 'bearer') {
-		return send(401, 'Invalid Authorization format');
+		return utils.send(401, 'Invalid Authorization format');
 	}
 
 	try {
 		var payload = await JWT.verify(token);
 	} catch (err) {
-		return send(401, (err as Error).message);
+		return utils.send(401, (err as Error).message);
 	}
 
 	// Does `user.uid` exist?
@@ -230,7 +229,7 @@ export const authenticate: Handler = async function (req, context) {
 	// NOTE: user salt changes w/ password
 	// AKA, mismatched salt is forgery or pre-reset token
 	if (!user || payload.salt !== user.salt) {
-		return send(401, 'Invalid token');
+		return utils.send(401, 'Invalid token');
 	}
 
 	context.user = user;

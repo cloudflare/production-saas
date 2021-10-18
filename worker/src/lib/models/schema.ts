@@ -1,5 +1,4 @@
 import * as utils from 'lib/utils';
-import { send } from 'worktop/response';
 import * as database from 'lib/utils/database';
 import * as Customers from 'lib/stripe/customers';
 import * as Owner from './owner';
@@ -165,11 +164,11 @@ export const load: Handler = async function (req, context) {
 	const { spaceid, schemaid } = context.params;
 
 	if (!isUID(schemaid!)) {
-		return send(400, 'Invalid Schema identifier');
+		return utils.send(400, 'Invalid Schema identifier');
 	}
 
 	let item = await find(spaceid!, schemaid);
-	if (!item) return send(404, 'Schema not found');
+	if (!item) return utils.send(404, 'Schema not found');
 
 	context.schema = item;
 }

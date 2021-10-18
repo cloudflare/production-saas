@@ -1,10 +1,9 @@
 import { compose } from 'worktop';
-import * as utils from 'worktop/utils';
-import { send } from 'worktop/response';
 import * as paging from 'lib/utils/paging';
 import * as Document from 'lib/models/doc';
 import * as Space from 'lib/models/space';
 import * as User from 'lib/models/user';
+import * as utils from 'lib/utils';
 
 // TODO:
 //  - request validation
@@ -24,7 +23,7 @@ export const list = compose(
 		const items = await Document.list(spaceid, { limit, page });
 
 		const output = items.map(Document.output);
-		return send(200, output);
+		return utils.send(200, output);
 	}
 );
 
@@ -41,20 +40,20 @@ export const create = compose(
 
 		if (!slug) {
 			// TODO: maybe default `slug` to `uid` if blank?
-			return send(400, 'TODO: port over validation lib');
+			return utils.send(400, 'TODO: port over validation lib');
 		}
 
 		const { user, space, schema } = context;
 		const exists = await Document.lookup(space!.uid, slug);
-		if (exists) return send(422, 'A document already exists with this slug');
+		if (exists) return utils.send(422, 'A document already exists with this slug');
 
 		// TODO: valiadate `schema.fields` okay
 
 		const doc = await Document.insert({ slug }, schema!, user!);
-		if (!doc) return send(500, 'Error creating document');
+		if (!doc) return utils.send(500, 'Error creating document');
 
 		const output = Document.output(doc);
-		return send(201, output);
+		return utils.send(201, output);
 	}
 );
 
@@ -68,7 +67,7 @@ export const show = compose(
 	Document.load,
 	function (req, context) {
 		const doc = context.document!;
-		return send(200, Document.output(doc));
+		return utils.send(200, Document.output(doc));
 	}
 );
 
@@ -85,12 +84,12 @@ export const update = compose(
 		const slug = input && input.slug && input.slug.trim();
 
 		if (!slug) {
-			return send(400, 'TODO: port over validation lib');
+			return utils.send(400, 'TODO: port over validation lib');
 		}
 
 		const doc = await Document.update(context.document!, { slug });
-		if (!doc) return send(500, 'Error updating document');
-		else return send(200, Document.output(doc));
+		if (!doc) return utils.send(500, 'Error updating document');
+		else return utils.send(200, Document.output(doc));
 	}
 );
 
@@ -104,7 +103,7 @@ export const destroy = compose(
 	Document.load,
 	async function (req, context) {
 		const { user, document } = context;
-		if (await Document.destroy(document!, user!)) return send(204);
-		else return send(500, 'Error while destroying document');
+		if (await Document.destroy(document!, user!)) return utils.send(204);
+		else return utils.send(500, 'Error while destroying document');
 	}
 );

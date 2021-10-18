@@ -1,7 +1,6 @@
 import { compose } from 'worktop';
-import * as utils from 'worktop/utils';
-import { send } from 'worktop/response';
 import * as User from 'lib/models/user';
+import * as utils from 'lib/utils';
 
 /**
  * PUT /users/:userid
@@ -13,7 +12,7 @@ export const update = compose(
 		let user = context.user!;
 
 		if (context.params.userid !== user.uid) {
-			return send(403, 'You cannot do that');
+			return utils.send(403, 'You cannot do that');
 		}
 
 		type Input = Partial<User.User>;
@@ -23,11 +22,11 @@ export const update = compose(
 		// Only continue if we have new values
 		if (input && Object.keys(input).length > 0) {
 			const doc = await User.update(user, input);
-			if (!doc) return send(500, 'Error updating user document');
+			if (!doc) return utils.send(500, 'Error updating user document');
 			user = doc;
 		}
 
 		const output = await User.tokenize(user);
-		return send(200, output);
+		return utils.send(200, output);
 	}
 );

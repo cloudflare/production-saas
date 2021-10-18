@@ -1,9 +1,8 @@
 import { compose } from 'worktop';
-import * as utils from 'worktop/utils';
-import { send } from 'worktop/response';
 import * as Email from 'lib/models/email';
 import * as Password from 'lib/models/password';
 import * as User from 'lib/models/user';
+import * as utils from 'lib/utils';
 
 import type { Handler } from 'lib/context';
 import type { Credentials } from 'lib/models/user';
@@ -18,19 +17,19 @@ export const register: Handler = async req => {
 	const input = await utils.body<Credentials>(req);
 
 	if (!input || !input.email || !input.password) {
-		return send(400, 'TODO: port over validation lib');
+		return utils.send(400, 'TODO: port over validation lib');
 	}
 
 	// Check for existing user email
 	const { email, password } = input;
 	const userid = await Email.find(email);
-	if (userid) return send(400, 'An account already exists for this address');
+	if (userid) return utils.send(400, 'An account already exists for this address');
 
 	const user = await User.insert({ email, password });
-	if (!user) return send(500, 'Error creating account');
+	if (!user) return utils.send(500, 'Error creating account');
 
 	const output = await User.tokenize(user);
-	return send(201, output);
+	return utils.send(201, output);
 }
 
 /**
@@ -40,7 +39,7 @@ export const login: Handler = async req => {
 	const input = await utils.body<Credentials>(req);
 
 	if (!input || !input.email || !input.password) {
-		return send(400, 'TODO: port over validation lib');
+		return utils.send(400, 'TODO: port over validation lib');
 	}
 
 	// the amibiguous error message to send
@@ -49,16 +48,16 @@ export const login: Handler = async req => {
 	// Check for existing user email
 	const { email, password } = input;
 	const userid = await Email.find(email);
-	if (!userid) return send(401, ambiguous);
+	if (!userid) return utils.send(401, ambiguous);
 
 	const user = await User.find(userid);
-	if (!user) return send(401, ambiguous);
+	if (!user) return utils.send(401, ambiguous);
 
 	const isMatch = await Password.compare(user, password);
-	if (!isMatch) return send(401, ambiguous);
+	if (!isMatch) return utils.send(401, ambiguous);
 
 	const output = await User.tokenize(user);
-	return send(200, output);
+	return utils.send(200, output);
 }
 
 /**
@@ -70,7 +69,7 @@ export const refresh: Handler = compose(
 	async (req, context) => {
 		const user = context.user!;
 		const output = await User.tokenize(user);
-		return send(200, output);
+		return utils.send(200, output);
 	}
 ) as Handler;
 
@@ -83,7 +82,7 @@ export const forgot: Handler = async req => {
 	const input = await utils.body<Input>(req);
 
 	if (!input || !input.email) {
-		return send(400, 'TODO: port over validation lib');
+		return utils.send(400, 'TODO: port over validation lib');
 	}
 
 	// the amibiguous message to send
@@ -91,13 +90,13 @@ export const forgot: Handler = async req => {
 
 	// Check for existing user email
 	const userid = await Email.find(input.email);
-	if (!userid) return send(200, ambiguous);
+	if (!userid) return utils.send(200, ambiguous);
 
 	const user = await User.find(userid);
-	if (!user) return send(200, ambiguous);
+	if (!user) return utils.send(200, ambiguous);
 
-	if (await Password.forgot(user)) return send(200, ambiguous);
-	else return send(400, 'Error while resetting password');
+	if (await Password.forgot(user)) return utils.send(200, ambiguous);
+	else return utils.send(400, 'Error while resetting password');
 }
 
 /**
@@ -108,7 +107,7 @@ export const reset: Handler = async req => {
 	const input = await utils.body<Input>(req);
 
 	if (!input || !input.email || !input.password || !input.token) {
-		return send(400, 'TODO: port over validation lib');
+		return utils.send(400, 'TODO: port over validation lib');
 	}
 
 	// the amibiguous message to send
@@ -116,22 +115,22 @@ export const reset: Handler = async req => {
 	const { token, email, password } = input;
 
 	const isValid = Password.isUID(token);
-	if (!isValid) return send(400, ambiguous);
+	if (!isValid) return utils.send(400, ambiguous);
 
 	const userid = await Password.find(token);
-	if (!userid) return send(400, ambiguous);
+	if (!userid) return utils.send(400, ambiguous);
 
 	let user = await User.find(userid);
-	if (!user) return send(400, ambiguous);
+	if (!user) return utils.send(400, ambiguous);
 
 	if (user.email !== email) {
-		return send(400, ambiguous);
+		return utils.send(400, ambiguous);
 	}
 
 	// regenerate salt
 	user = await User.update(user, { password });
-	if (!user) return send(500, 'Error updating user document');
+	if (!user) return utils.send(500, 'Error updating user document');
 
 	const output = await User.tokenize(user);
-	return send(200, output);
+	return utils.send(200, output);
 }
