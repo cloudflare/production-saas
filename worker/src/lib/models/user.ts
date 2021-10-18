@@ -1,4 +1,4 @@
-import * as JWT from 'lib/utils/jwt';
+import { HS256 } from 'worktop/jwt';
 import * as keys from 'lib/utils/keys';
 import * as Password from 'lib/models/password';
 import * as database from 'lib/utils/database';
@@ -43,6 +43,18 @@ export interface Credentials {
 export const toUID = () => keys.gen(16) as UserID;
 export const toKID = (uid: UserID) => `users::${uid}`;
 export const isUID = (x: string | UserID): x is UserID => x.length === 16;
+
+export interface TokenData {
+	uid: User['uid'];
+	salt: User['salt'];
+}
+
+// The JWT factory
+// NOTE: tokens expire in 24 hours
+export const JWT = HS256<TokenData>({
+	key: JWT_SECRET,
+	expires: 86400, // 24 hours
+});
 
 /**
  * Find a `User` document by its `uid` value.
@@ -195,42 +207,30 @@ export async function tokenize(user: User) {
 }
 
 /**
- * Exchange a JWT for a `User` document, if valid.
- * @NOTE Does not handle `JWT.verify` errors!
- * @param token The incoming JWT token
- */
-export async function identify(token: string): Promise<User|never> {
-	const { uid, salt } = await JWT.verify(token);
-
-	// Does `user.uid` exist?
-	const user = await find(uid);
-	if (!user) throw JWT.INVALID;
-
-	// NOTE: user salt changes w/ password
-	// AKA, mismatched salt is forgery or pre-reset token
-	if (user.salt !== salt) throw JWT.INVALID;
-
-	return user;
-}
-
-/**
  * Authentication middleware
  * Identifies a User via incoming `Authorization` header.
- * @TODO Potentially add `Cookie` identity-parsing fallback.
  */
 export const authenticate: Handler = async function (req, context) {
-	// TODO? Generic error messages instead?
-	const auth = req.headers.get('authorization');
+	let auth = req.headers.get('authorization');
 	if (!auth) return send(401, 'Missing Authorization header');
 
-	const [schema, token] = auth.split(' ');
-	if (schema !== 'Bearer') return send(401, 'Invalid Authorization format');
-	if (!token) return send(401, 'Missing Authorization token');
+	let [schema, token] = auth.split(/\s+/);
+	if (!token || schema.toLowerCase() !== 'bearer') {
+		return send(401, 'Invalid Authorization format');
+	}
 
 	try {
-		var user = await identify(token);
+		var payload = await JWT.verify(token);
 	} catch (err) {
 		return send(401, (err as Error).message);
+	}
+
+	// Does `user.uid` exist?
+	let user = await find(payload.uid);
+	// NOTE: user salt changes w/ password
+	// AKA, mismatched salt is forgery or pre-reset token
+	if (!user || payload.salt !== user.salt) {
+		return send(401, 'Invalid token');
 	}
 
 	context.user = user;
