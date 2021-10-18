@@ -1,9 +1,9 @@
 import { toHEX } from 'worktop/buffer';
 import { PBKDF2 } from 'worktop/crypto';
 import * as database from 'lib/utils/database';
-import * as keys from 'lib/utils/keys';
+import * as utils from 'lib/utils';
 
-import type { UID } from 'worktop/utils';
+import type { UID } from 'lib/utils';
 import type { User, UserID } from 'lib/models/user';
 
 export type SALT = UID<128>;
@@ -14,7 +14,7 @@ export type TOKEN = UID<100>;
  * Generate a new `UID<128>` value.
  * @NOTE This is a `user`-specific password salter.
  */
-export const salt = () => keys.gen(128) as SALT;
+export const salt = () => utils.uid(128) as SALT;
 
 /**
  * Hash a raw `password` string.
@@ -41,7 +41,7 @@ export async function prepare(password: string) {
 }
 
 // NOTE: "reset::{token}" keys point to `User.uid` values
-export const toUID = () => keys.gen(100) as TOKEN;
+export const toUID = () => utils.uid(100) as TOKEN;
 export const toKID = (token: TOKEN) => `reset::${token}`;
 export const isUID = (x: TOKEN | string): x is TOKEN => x.length === 100;
 
@@ -60,7 +60,7 @@ export function find(token: TOKEN) {
  */
 export async function forgot(user: User): Promise<boolean> {
 	// Create new TOKENs until find unused value
-	const token = await keys.until(toUID, find);
+	const token = await utils.until(toUID, find);
 
 	// Persist the TOKEN value to storage; auto-expire after 12 hours (in secs)
 	await database.write(toKID(token), user.uid, { expirationTtl: 12 * 60 * 60 });

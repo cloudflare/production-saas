@@ -1,9 +1,9 @@
 import { HS256 } from 'worktop/jwt';
-import * as keys from 'lib/utils/keys';
 import * as Password from 'lib/models/password';
 import * as database from 'lib/utils/database';
 import * as emails from 'lib/sendgrid/users';
 import { send } from 'worktop/response';
+import * as utils from 'lib/utils';
 import * as Email from './email';
 
 import * as Prices from 'lib/stripe/prices';
@@ -40,7 +40,7 @@ export interface Credentials {
 }
 
 // ID helpers to normalize ID types/values
-export const toUID = () => keys.gen(16) as UserID;
+export const toUID = () => utils.uid(16) as UserID;
 export const toKID = (uid: UserID) => `users::${uid}`;
 export const isUID = (x: string | UserID): x is UserID => x.length === 16;
 
@@ -82,7 +82,7 @@ export async function insert(values: Credentials): Promise<User|void> {
 	const { password, salt } = await Password.prepare(values.password);
 
 	// Create new `UserID`s until available
-	const nxtUID = await keys.until(toUID, find);
+	const nxtUID = await utils.until(toUID, find);
 
 	// Create the Stripe Customer record
 	const subscription = await Customers.create({

@@ -1,12 +1,12 @@
-import * as keys from 'lib/utils/keys';
+import * as utils from 'lib/utils';
 import { send } from 'worktop/response';
 import * as database from 'lib/utils/database';
 import * as Customers from 'lib/stripe/customers';
 import * as Owner from './owner';
 
-import type { Handler } from 'lib/context';
-import type { ULID } from 'worktop/utils';
+import type { ULID } from 'lib/utils';
 import type { Options } from 'worktop/kv';
+import type { Handler } from 'lib/context';
 import type { Space, SpaceID } from './space';
 import type { User } from './user';
 
@@ -35,9 +35,9 @@ export interface Schema {
 }
 
 // ID helpers to normalize ID types/values
-export const toUID = keys.ulid;
+export const toUID = utils.ulid;
+export const isUID = utils.isULID;
 export const toKID = (spaceid: SpaceID, uid: SchemaID) => `spaces::${spaceid}::types::${uid}`;
-export const isUID = (x: SchemaID|string): x is SchemaID => x.length === 26;
 
 /**
  * Find a `Space` document by its `uid` value.
@@ -97,7 +97,7 @@ export async function insert(values: { name: string }, space: Space, user: User)
 
 	const doc: Schema = {
 		// Create new `SchemaID`s until available
-		uid: await keys.until(toUID, toFind),
+		uid: await utils.until(toUID, toFind),
 		name: values.name.trim(),
 		spaceid: space.uid,
 		created_at: Date.now(),

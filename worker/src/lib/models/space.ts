@@ -1,11 +1,11 @@
-import * as keys from 'lib/utils/keys';
+import * as utils from 'lib/utils';
 import { send } from 'worktop/response';
 import * as database from 'lib/utils/database';
 import * as Customers from 'lib/stripe/customers';
 import * as Owner from './owner';
 
 import type { Handler } from 'lib/context';
-import type { UID } from 'worktop/utils';
+import type { UID } from 'lib/utils';
 import type { User } from './user';
 
 export type SpaceID = UID<11>;
@@ -19,7 +19,7 @@ export interface Space {
 }
 
 // ID helpers to normalize ID types/values
-export const toUID = () => keys.gen(11) as SpaceID;
+export const toUID = () => utils.uid(11) as SpaceID;
 export const toKID = (uid: SpaceID) => `spaces::${uid}`;
 export const isUID = (x: SpaceID|string): x is SpaceID => x.length === 11;
 
@@ -70,7 +70,7 @@ export function save(doc: Space): Promise<boolean> {
 export async function insert(values: { name: string }, user: User): Promise<Space|void> {
 	const doc: Space = {
 		// Create new `SpaceID`s until available
-		uid: await keys.until(toUID, find),
+		uid: await utils.until(toUID, find),
 		name: values.name.trim(),
 		created_at: Date.now(),
 		last_updated: null,

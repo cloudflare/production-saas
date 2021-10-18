@@ -1,12 +1,12 @@
-import * as keys from 'lib/utils/keys';
+import * as utils from 'lib/utils';
 import { send } from 'worktop/response';
 import * as database from 'lib/utils/database';
 import * as Customers from 'lib/stripe/customers';
 import * as Owner from './owner';
 
-import type { Handler } from 'lib/context';
-import type { ULID } from 'worktop/utils';
+import type { ULID } from 'lib/utils';
 import type { Options } from 'worktop/kv';
+import type { Handler } from 'lib/context';
 import type { Schema, SchemaID } from './schema';
 import type { SpaceID } from './space';
 import type { User } from './user';
@@ -26,8 +26,8 @@ export interface Doc {
 }
 
 // ID helpers to normalize ID types/values
-export const toUID = keys.ulid;
-export const isUID = (x: DocID|string): x is DocID => x.length === 26;
+export const toUID = utils.ulid;
+export const isUID = utils.isULID;
 export const toKID = (spaceid: SpaceID, uid: DocID) => `spaces::${spaceid}::docs::${uid}`;
 export const toPID = (spaceid: SpaceID, slug: string) => `spaces::${spaceid}::slugs::${slug}`;
 
@@ -104,7 +104,7 @@ export async function insert(values: Pick<Doc, 'slug'>, schema: Schema, user: Us
 
 	const doc: Doc = {
 		// Create new `DocID`s until available
-		uid: await keys.until(toUID, toFind),
+		uid: await utils.until(toUID, toFind),
 		slug: values.slug.trim(),
 		fields: {
 			// TODO: normalize/validate
