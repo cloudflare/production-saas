@@ -28,8 +28,7 @@ export const register: Handler = async req => {
 	const user = await User.insert({ email, password });
 	if (!user) return utils.send(500, 'Error creating account');
 
-	const output = await User.tokenize(user);
-	return utils.send(201, output);
+	return User.respond(201, user);
 }
 
 /**
@@ -56,8 +55,7 @@ export const login: Handler = async req => {
 	const isMatch = await Password.compare(user, password);
 	if (!isMatch) return utils.send(401, ambiguous);
 
-	const output = await User.tokenize(user);
-	return utils.send(200, output);
+	return User.respond(200, user);
 }
 
 /**
@@ -68,8 +66,7 @@ export const refresh: Handler = compose(
 	User.authenticate,
 	async (req, context) => {
 		const user = context.user!;
-		const output = await User.tokenize(user);
-		return utils.send(200, output);
+		return User.respond(200, user);
 	}
 ) as Handler;
 
@@ -131,6 +128,5 @@ export const reset: Handler = async req => {
 	user = await User.update(user, { password });
 	if (!user) return utils.send(500, 'Error updating user document');
 
-	const output = await User.tokenize(user);
-	return utils.send(200, output);
+	return User.respond(200, user);
 }

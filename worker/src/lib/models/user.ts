@@ -201,11 +201,13 @@ export function output(user: User) {
 }
 
 /**
- * Format a `User` document while computing a fresh JWT.
+ * Format a `User` document for Auth response
  */
-export async function tokenize(user: User) {
-	const token = await JWT.sign(user);
-	return { user: output(user), token };
+export async function respond(code: number, user: User): Promise<Response> {
+	return utils.send(code, {
+		token: await JWT.sign(user),
+		user: output(user),
+	});
 }
 
 /**

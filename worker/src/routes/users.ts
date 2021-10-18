@@ -26,7 +26,6 @@ export const update = compose(
 			user = doc;
 		}
 
-		const output = await User.tokenize(user);
-		return utils.send(200, output);
+		return User.respond(200, user);
 	}
 );
