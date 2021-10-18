@@ -20,12 +20,12 @@ export type UserID = UID<16>;
 export interface User {
 	uid: UserID;
 	email: string;
+	firstname: Nullable<string>;
+	lastname: Nullable<string>;
+	created_at: TIMESTAMP;
+	last_updated: Nullable<TIMESTAMP>;
 	password: PASSWORD;
 	salt: SALT;
-	firstname?: Nullable<string>;
-	lastname?: Nullable<string>;
-	created_at: TIMESTAMP;
-	last_updated?: Nullable<TIMESTAMP>;
 	stripe: {
 		customer: Customer['id'];
 		subscription: Subscription['id'];
@@ -76,7 +76,8 @@ export function save(user: User): Promise<boolean> {
  * @NOTE Handles `password`, `salt`, and `uid` values.
  * @TODO throw w/ message instead of early returns?
  */
-export async function insert(values: Credentials): Promise<User|void> {
+type Insert = Omit<Partial<User>, 'email'|'password'> & Credentials;
+export async function insert(values: Insert): Promise<User|void> {
 	// Generate a new salt & hash the original password
 	const { password, salt } = await Password.prepare(values.password);
 
@@ -105,6 +106,8 @@ export async function insert(values: Credentials): Promise<User|void> {
 	const user: User = {
 		uid: nxtUID,
 		email: values.email,
+		firstname: values.firstname || null,
+		lastname: values.lastname || null,
 		created_at: utils.seconds(),
 		last_updated: null,
 		stripe: {

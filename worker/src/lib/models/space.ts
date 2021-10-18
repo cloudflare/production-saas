@@ -14,7 +14,7 @@ export interface Space {
 	name: string;
 	owner: Owner.Owner;
 	created_at: TIMESTAMP;
-	last_updated?: Nullable<TIMESTAMP>;
+	last_updated: Nullable<TIMESTAMP>;
 }
 
 // ID helpers to normalize ID types/values
