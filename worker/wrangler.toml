@@ -12,9 +12,6 @@ watch_dir = "worker"
 main = "./index.js"
 dir = "./build"
 
-[miniflare]
-kv_persist = "./build/kv/"
-
 [[kv_namespaces]]
 binding = "DATABASE"
 preview_id = "<ignored>"

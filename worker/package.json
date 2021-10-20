@@ -3,7 +3,7 @@
   "scripts": {
     "build": "cfw build src -s",
     "deploy": "cfw deploy build -s",
-    "dev": "miniflare --watch --build-watch-path=src"
+    "dev": "miniflare --watch --kv-persist=build/kv/ --build-watch-path=src"
   },
   "dependencies": {
     "worktop": "0.8.0-next.5"
