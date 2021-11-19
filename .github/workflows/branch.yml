@@ -45,14 +45,6 @@ jobs:
     - name: (worker) Compiles
       run: pnpm run worker build
 
-    # todo: temporary - needs "client" dir check
-    # todo(pages) - need open-ended "preview" deploy hook (see #9)
-    # - name: (client) Deploy
-    #   if: ${{ github.ref == 'refs/heads/main' }}
-    #   run: curl -X POST "$DEPLOY_HOOK"
-    #   env:
-    #     DEPLOY_HOOK: ${{ secrets.PAGES_DEPLOY_PROD }}
-
     # todo: temporary - needs "worker" dir check
     - name: (worker) Deploy
       if: ${{ github.ref == 'refs/heads/main' }}

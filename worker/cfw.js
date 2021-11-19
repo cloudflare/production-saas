@@ -4,7 +4,7 @@ const ENV = process.env;
 /**
  * @type {import('cfw').Config}
  */
-const config = {
+module.exports = {
 	entry: 'index.ts',
 	profile: 'workers.demo',
 	name: 'cms-api',
@@ -19,6 +19,4 @@ const config = {
 		SENDGRID_EMAIL: 'ENV:demo@ley.dev',
 		SENDGRID_NAME: 'ENV:DEMO CMS',
 	}
-}
-
-module.exports = config;
+};

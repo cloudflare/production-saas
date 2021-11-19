@@ -1,7 +1,6 @@
 {
   "private": true,
   "scripts": {
-    "client": "npm -C=client run",
     "worker": "npm -C=worker run",
     "types": "tsc --noEmit"
   },
