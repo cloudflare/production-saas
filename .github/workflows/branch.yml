@@ -42,10 +42,10 @@ jobs:
     - name: Check Types
       run: pnpm run types
 
-    - name: (worker) Compiles
+    - name: Compiles
       run: pnpm run build
 
-    # todo: temporary - needs "worker" dir check
-    - name: (worker) Deploy
-      if: ${{ github.ref == 'refs/heads/main' }}
-      run: pnpm run deploy
+    # todo: temporary - needs "src" dir check
+    # - name: Deploy
+    #   if: ${{ github.ref == 'refs/heads/main' }}
+    #   run: pnpm run deploy
