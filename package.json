@@ -1,10 +1,17 @@
 {
   "private": true,
   "scripts": {
-    "worker": "npm -C=worker run",
+    "build": "cfw build src -s",
+    "deploy": "cfw deploy build -s",
+    "dev": "miniflare --watch --kv-persist=build/kv/ --build-watch-path=src",
     "types": "tsc --noEmit"
   },
+  "dependencies": {
+    "worktop": "0.8.0-next.5"
+  },
   "devDependencies": {
+    "cfw": "0.3.0",
+    "miniflare": "1.4.1",
     "typescript": "4.4.3"
   }
 }

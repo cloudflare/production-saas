@@ -17,11 +17,12 @@
     "checkJs": true,
     "noEmit": true,
     "paths": {
-      "lib/*": ["./worker/src/lib/*"]
+      "lib/*": ["./src/lib/*"]
     }
   },
   "include": [
-    "worker/**/*"
+    "@types",
+    "src"
   ],
   "exclude": [
     "worker/build/**",

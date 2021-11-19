@@ -43,9 +43,9 @@ jobs:
       run: pnpm run types
 
     - name: (worker) Compiles
-      run: pnpm run worker build
+      run: pnpm run build
 
     # todo: temporary - needs "worker" dir check
     - name: (worker) Deploy
       if: ${{ github.ref == 'refs/heads/main' }}
-      run: pnpm run worker deploy
+      run: pnpm run deploy

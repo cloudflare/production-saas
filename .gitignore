@@ -7,7 +7,5 @@ node_modules
 .env
 .env.prod
 
-/worker/build
-/client/public
-
+/build
 /ignore
