@@ -7,7 +7,7 @@ const ENV = process.env;
 const config = {
 	entry: 'index.ts',
 	profile: 'workers.demo',
-	name: 'contentful-api',
+	name: 'cms-api',
 	routes: [
 		'api.ley.dev/*'
 	],
