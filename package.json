@@ -7,7 +7,7 @@
     "types": "tsc --noEmit"
   },
   "dependencies": {
-    "worktop": "0.8.0-next.8"
+    "worktop": "0.8.0-next.10"
   },
   "devDependencies": {
     "cfw": "0.3.0",

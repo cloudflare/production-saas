@@ -1,5 +1,5 @@
-import * as DB from 'worktop/kv';
-import type { Options } from 'worktop/kv';
+import * as DB from 'worktop/cfw.kv';
+import type { Options } from 'worktop/cfw.kv';
 
 export function write<T>(key: string, value: T, options?: Options.Write): Promise<boolean> {
 	return DB.write<T>(DATABASE, key, value, { toJSON: true, ...options });

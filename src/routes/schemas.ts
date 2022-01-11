@@ -22,7 +22,7 @@ export const list = compose(
 		const items = await Schema.list(spaceid, { limit, page });
 
 		const output = items.map(Schema.output);
-		return utils.send(200, output);
+		return utils.reply(200, output);
 	}
 );
 
@@ -38,16 +38,16 @@ export const create = compose(
 		const name = input && input.name && input.name.trim();
 
 		if (!name) {
-			return utils.send(400, 'TODO: port over validation lib');
+			return utils.reply(400, 'TODO: port over validation lib');
 		}
 
 		const { user, space } = context;
 
 		const doc = await Schema.insert({ name }, space!, user!);
-		if (!doc) return utils.send(500, 'Error creating document');
+		if (!doc) return utils.reply(500, 'Error creating document');
 
 		const output = Schema.output(doc);
-		return utils.send(201, output);
+		return utils.reply(201, output);
 	}
 );
 
@@ -61,7 +61,7 @@ export const show = compose(
 	Schema.load,
 	function (req, context) {
 		const doc = context.schema!;
-		return utils.send(200, Schema.output(doc));
+		return utils.reply(200, Schema.output(doc));
 	}
 );
 
@@ -78,14 +78,14 @@ export const update = compose(
 		const name = input && input.name && input.name.trim();
 
 		if (!name) {
-			return utils.send(400, 'TODO: port over validation lib');
+			return utils.reply(400, 'TODO: port over validation lib');
 		}
 
 		const { schema } = context;
 
 		const doc = await Schema.update(schema!, { name });
-		if (doc) return utils.send(200, Schema.output(doc));
-		return utils.send(500, 'Error updating document');
+		if (doc) return utils.reply(200, Schema.output(doc));
+		return utils.reply(500, 'Error updating document');
 	}
 );
 
@@ -99,7 +99,7 @@ export const destroy = compose(
 	Schema.load,
 	async function (req, context) {
 		const { user, schema } = context;
-		if (await Schema.destroy(schema!, user!)) return utils.send(204);
-		return utils.send(500, 'Error while destroying Schema');
+		if (await Schema.destroy(schema!, user!)) return utils.reply(204);
+		return utils.reply(500, 'Error while destroying Schema');
 	}
 );

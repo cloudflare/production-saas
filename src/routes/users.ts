@@ -12,7 +12,7 @@ export const update = compose(
 		let user = context.user!;
 
 		if (context.params.userid !== user.uid) {
-			return utils.send(403, 'You cannot do that');
+			return utils.reply(403, 'You cannot do that');
 		}
 
 		type Input = Partial<User.User>;
@@ -22,7 +22,7 @@ export const update = compose(
 		// Only continue if we have new values
 		if (input && Object.keys(input).length > 0) {
 			const doc = await User.update(user, input);
-			if (!doc) return utils.send(500, 'Error updating user document');
+			if (!doc) return utils.reply(500, 'Error updating user document');
 			user = doc;
 		}
 

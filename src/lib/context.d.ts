@@ -1,5 +1,5 @@
 import type * as worktop from 'worktop';
-import type { KV } from 'worktop/kv';
+import type { KV } from 'worktop/cfw.kv';
 
 import type { Schema, SchemaID } from 'lib/models/schema';
 import type { Space, SpaceID } from 'lib/models/space';

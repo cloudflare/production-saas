@@ -204,7 +204,7 @@ export function output(user: User) {
  * Format a `User` document for Auth response
  */
 export async function respond(code: number, user: User): Promise<Response> {
-	return utils.send(code, {
+	return utils.reply(code, {
 		token: await JWT.sign(user),
 		user: output(user),
 	});
@@ -216,17 +216,17 @@ export async function respond(code: number, user: User): Promise<Response> {
  */
 export const authenticate: Handler = async function (req, context) {
 	let auth = req.headers.get('authorization');
-	if (!auth) return utils.send(401, 'Missing Authorization header');
+	if (!auth) return utils.reply(401, 'Missing Authorization header');
 
 	let [schema, token] = auth.split(/\s+/);
 	if (!token || schema.toLowerCase() !== 'bearer') {
-		return utils.send(401, 'Invalid Authorization format');
+		return utils.reply(401, 'Invalid Authorization format');
 	}
 
 	try {
 		var payload = await JWT.verify(token);
 	} catch (err) {
-		return utils.send(401, (err as Error).message);
+		return utils.reply(401, (err as Error).message);
 	}
 
 	// Does `user.uid` exist?
@@ -234,7 +234,7 @@ export const authenticate: Handler = async function (req, context) {
 	// NOTE: user salt changes w/ password
 	// AKA, mismatched salt is forgery or pre-reset token
 	if (!user || payload.salt !== user.salt) {
-		return utils.send(401, 'Invalid token');
+		return utils.reply(401, 'Invalid token');
 	}
 
 	context.user = user;

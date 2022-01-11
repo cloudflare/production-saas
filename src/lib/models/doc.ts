@@ -4,8 +4,8 @@ import * as Customers from 'lib/stripe/customers';
 import * as Owner from './owner';
 
 import type { ULID } from 'lib/utils';
-import type { Options } from 'worktop/kv';
 import type { Handler } from 'lib/context';
+import type { Options } from 'worktop/cfw.kv';
 import type { Schema, SchemaID } from './schema';
 import type { SpaceID } from './space';
 import type { User } from './user';
@@ -182,11 +182,11 @@ export const load: Handler = async (req, context) => {
 	} else if (alias = await lookup(spaceid, docid)) {
 		docid = alias; // was a valid slug
 	} else {
-		return utils.send(400, 'Invalid document identifier');
+		return utils.reply(400, 'Invalid document identifier');
 	}
 
 	let doc = await find(spaceid, docid);
-	if (!doc) return utils.send(404, 'Document not found');
+	if (!doc) return utils.reply(404, 'Document not found');
 
 	context.document = doc;
 }

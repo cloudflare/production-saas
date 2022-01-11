@@ -20,7 +20,7 @@ export const list = compose(
 			);
 		}
 
-		return utils.send(200, output);
+		return utils.reply(200, output);
 	}
 );
 
@@ -35,14 +35,14 @@ export const create = compose(
 		const name = input && input.name && input.name.trim();
 
 		if (!name) {
-			return utils.send(400, 'TODO: port over validation lib');
+			return utils.reply(400, 'TODO: port over validation lib');
 		}
 
 		const doc = await Space.insert({ name }, context.user!);
-		if (!doc) return utils.send(500, 'Error creating document');
+		if (!doc) return utils.reply(500, 'Error creating document');
 
 		const output = Space.output(doc);
-		return utils.send(201, output);
+		return utils.reply(201, output);
 	}
 );
 
@@ -55,7 +55,7 @@ export const show = compose(
 	Space.load, Space.isAuthorized,
 	function (req, context) {
 		const space = context.space!;
-		return utils.send(200, Space.output(space));
+		return utils.reply(200, Space.output(space));
 	}
 );
 
@@ -70,11 +70,11 @@ export const update = compose(
 		const input = await utils.body<{ name?: string }>(req);
 		const name = input && input.name && input.name.trim();
 
-		if (!name) return utils.send(400, 'TODO: port over validation lib');
+		if (!name) return utils.reply(400, 'TODO: port over validation lib');
 		const doc = await Space.update(context.space!, { name });
 
-		if (doc) return utils.send(200, Space.output(doc));
-		return utils.send(500, 'Error updating document');
+		if (doc) return utils.reply(200, Space.output(doc));
+		return utils.reply(500, 'Error updating document');
 	}
 );
 
@@ -87,7 +87,7 @@ export const destroy = compose(
 	Space.load, Space.isAuthorized,
 	async function (req, context) {
 		const { user, space } = context;
-		if (await Space.destroy(space!, user!)) return utils.send(204);
-		return utils.send(500, 'Error while destroying Space');
+		if (await Space.destroy(space!, user!)) return utils.reply(204);
+		return utils.reply(500, 'Error while destroying Space');
 	}
 );

@@ -4,8 +4,8 @@ import * as Customers from 'lib/stripe/customers';
 import * as Owner from './owner';
 
 import type { ULID } from 'lib/utils';
-import type { Options } from 'worktop/kv';
 import type { Handler } from 'lib/context';
+import type { Options } from 'worktop/cfw.kv';
 import type { Space, SpaceID } from './space';
 import type { User } from './user';
 
@@ -164,11 +164,11 @@ export const load: Handler = async function (req, context) {
 	const { spaceid, schemaid } = context.params;
 
 	if (!isUID(schemaid!)) {
-		return utils.send(400, 'Invalid Schema identifier');
+		return utils.reply(400, 'Invalid Schema identifier');
 	}
 
 	let item = await find(spaceid!, schemaid);
-	if (!item) return utils.send(404, 'Schema not found');
+	if (!item) return utils.reply(404, 'Schema not found');
 
 	context.schema = item;
 }

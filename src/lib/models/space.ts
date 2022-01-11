@@ -147,11 +147,11 @@ export const load: Handler = async function (req, context) {
 	const { spaceid } = context.params;
 
 	if (!isUID(spaceid!)) {
-		return utils.send(400, 'Invalid Space identifier');
+		return utils.reply(400, 'Invalid Space identifier');
 	}
 
 	const item = await find(spaceid);
-	if (!item) return utils.send(404, 'Space not found');
+	if (!item) return utils.reply(404, 'Space not found');
 
 	context.space = item;
 }
@@ -165,6 +165,6 @@ export const isAuthorized: Handler = function (req, context) {
 
 	// TODO: show 404 instead?
 	if (space!.owner.uid !== user!.uid) {
-		return utils.send(403);
+		return utils.reply(403);
 	}
 }
