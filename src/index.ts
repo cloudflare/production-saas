@@ -2,6 +2,7 @@
 import { Router, compose } from 'worktop';
 import * as Cache from 'worktop/cfw.cache';
 import * as CORS from 'worktop/cors';
+import { toError } from 'lib/utils';
 import * as cfw from 'worktop/cfw';
 
 // Routes
@@ -24,6 +25,11 @@ API.prepare = compose(
 		credentials: true,
 	}),
 );
+
+API.onerror = function (req, context) {
+	let { error, status=500 } = context;
+	return toError(status, error);
+}
 
 API.add('POST', '/auth/login', Auth.login);
 API.add('POST', '/auth/register', Auth.register);

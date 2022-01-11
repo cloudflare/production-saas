@@ -15,4 +15,9 @@ export const reply: typeof res.reply = function (code, data, headers) {
 	return res.reply(code, data, headers);
 }
 
+export function toError(code: number, error?: Error): Response {
+	let body = error && error.message || res.STATUS_CODES[code];
+	return reply(code, body || String(code));
+}
+
 export const seconds = (): TIMESTAMP => Date.now() / 1e3 | 0;
