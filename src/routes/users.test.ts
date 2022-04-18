@@ -1,7 +1,7 @@
 import * as assert from 'uvu/assert';
-import { define } from '../../test/e2e';
+import { describe } from '../../test/e2e';
 
-define('GET /users', it => {
+describe('GET /users', it => {
 	it('should return 404', async ctx => {
 		let res = await ctx.send('GET', '/users');
 		assert.is(res.statusCode, 404);
@@ -12,7 +12,7 @@ define('GET /users', it => {
 	});
 });
 
-define('PUT /users', it => {
+describe('PUT /users', it => {
 	it('should return 404', async ctx => {
 		let res = await ctx.send('PUT', '/users');
 		assert.is(res.statusCode, 404);
@@ -23,7 +23,7 @@ define('PUT /users', it => {
 	});
 });
 
-define('PUT /users/123', it => {
+describe('PUT /users/123', it => {
 	it('should return 401 if no user', async ctx => {
 		let res = await ctx.send('PUT', '/users/123');
 		assert.is(res.statusCode, 401);
