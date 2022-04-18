@@ -45,3 +45,13 @@ export function suite(name: string): uvu.Test<Context> {
 	test.after(clean);
 	return test;
 }
+
+type Builder = (it: uvu.Test<Context>) => void;
+export function define(name: string, fn: Builder): void {
+	let suite = uvu.suite<Context>(name);
+	suite.before(setup);
+	suite.after(clean);
+
+	fn(suite);
+	suite.run();
+}
