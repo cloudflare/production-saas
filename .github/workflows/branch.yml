@@ -36,8 +36,8 @@ jobs:
     - name: Install
       run: pnpm install
 
-    # - name: Run Tests
-    #   run: pnpm test
+    - name: Run Tests
+      run: pnpm test
 
     - name: Check Types
       run: pnpm run types
