@@ -1,8 +1,8 @@
 {
   "private": true,
+  "type": "module",
   "scripts": {
-    "build": "cfw build src -s",
-    "deploy": "cfw deploy build -s",
+    "build": "worktop build src/index.ts --minify",
     "dev": "miniflare --watch",
     "types": "tsc --noEmit"
   },
@@ -10,8 +10,8 @@
     "worktop": "0.8.0-next.12"
   },
   "devDependencies": {
-    "cfw": "0.3.0",
-    "typescript": "4.4.3"
     "miniflare": "2.4.0",
+    "typescript": "4.4.3",
+    "worktop.build": "0.0.5"
   }
 }
