@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "miniflare": "2.4.0",
-    "typescript": "4.4.3",
+    "typescript": "4.6.3",
     "worktop.build": "0.0.5"
   }
 }
