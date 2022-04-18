@@ -6,7 +6,7 @@
     "build": "worktop build src/index.ts --minify",
     "pretest": "npm run build",
     "test": "uvu src .test.ts$ -r tsm -r test/setup",
-    "types": "tsc --noEmit"
+    "types": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
     "worktop": "0.8.0-next.12"
