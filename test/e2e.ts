@@ -46,12 +46,13 @@ export function suite(name: string): uvu.Test<Context> {
 	return test;
 }
 
-type Builder = (it: uvu.Test<Context>) => void;
-export function describe(name: string, fn: Builder): void {
+export function describe(
+	name: string,
+	builder: (it: uvu.Test<Context>) => void
+): void {
 	let suite = uvu.suite<Context>(name);
 	suite.before(setup);
 	suite.after(clean);
-
-	fn(suite);
+	builder(suite);
 	suite.run();
 }
