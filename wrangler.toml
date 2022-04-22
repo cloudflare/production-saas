@@ -1,19 +1,27 @@
+name = "cms-api"
 type = "javascript"
-name = "cms-headless"
-workers_dev = true
+
 # Add your account ID here
 account_id = ""
+workers_dev = true
 
 [build]
 command = "npm run build"
-watch_dir = "worker"
 
 [build.upload]
 format = "service-worker"
-main = "./index.js"
+main = "./index.mjs"
 dir = "./build"
 
 [[kv_namespaces]]
 binding = "DATABASE"
+id = "802e0f5c830c45d09fcae3f506579341"
 preview_id = "<ignored>"
-id = "<ignored>"
+
+[vars]
+SENDGRID_EMAIL = "demo@ley.dev"
+SENDGRID_NAME = "DEMO CMS"
+
+[miniflare]
+kv_persist = true
+env_path = ".env.dev"

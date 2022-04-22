@@ -2,21 +2,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "cfw build src -s",
-    "deploy": "cfw deploy build -s",
-    "dev": "miniflare --watch --kv-persist=build/kv/ --build-watch-path=src",
-    "test": "esbuild --bundle --sourcemap --outdir=build ./src/index.ts && ava --verbose",
+    "build": "worktop build src/index.ts --minify",
+    "dev": "miniflare --watch",
+    "test": "pnpm build && ava --verbose",
     "types": "tsc --noEmit"
   },
   "dependencies": {
-    "worktop": "0.8.0-next.10"
+    "worktop": "0.8.0-next.12"
   },
   "devDependencies": {
     "ava": "^4.2.0",
-    "cfw": "0.3.0",
     "dotenv": "^16.0.0",
     "jsonwebtoken": "^8.5.1",
-    "miniflare": "^2.4.0",
-    "typescript": "4.4.3"
+    "miniflare": "2.4.0",
+    "typescript": "4.6.3",
+    "worktop.build": "0.0.5"
   }
 }
